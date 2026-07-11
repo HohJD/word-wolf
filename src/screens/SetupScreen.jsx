@@ -13,7 +13,7 @@ function suggestWolves(playerCount) {
   return 2;
 }
 
-export default function SetupScreen({ state, dispatch }) {
+export default function SetupScreen({ state, dispatch, onBack }) {
   const { config } = state;
   const categories = getCategories();
 
@@ -26,6 +26,11 @@ export default function SetupScreen({ state, dispatch }) {
 
   return (
     <div className="screen setup-screen">
+      {onBack && (
+        <button className="back-btn" onClick={onBack}>
+          ← Games
+        </button>
+      )}
       <div className="logo">
         <span className="wolf-icon">🐺</span>
         <h1>Word Wolf</h1>

@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import {
   createInitialState,
   dealRound,
@@ -10,6 +10,7 @@ import {
   playAgain,
   newSetup,
 } from "./gameEngine";
+import Dashboard from "./Dashboard";
 import SetupScreen from "./screens/SetupScreen";
 import RevealScreen from "./screens/RevealScreen";
 import DiscussScreen from "./screens/DiscussScreen";
@@ -17,15 +18,16 @@ import VoteScreen from "./screens/VoteScreen";
 import RevealRolesScreen from "./screens/RevealRolesScreen";
 import WolfGuessScreen from "./screens/WolfGuessScreen";
 import ResultScreen from "./screens/ResultScreen";
+import TruthOrDare from "./games/TruthOrDare";
+import WouldYouRather from "./games/WouldYouRather";
+import MostLikelyTo from "./games/MostLikelyTo";
 import "./App.css";
 
-function reducer(state, action) {
+// ── Word Wolf reducer ────────────────────────────────────────────────────────
+function wolfReducer(state, action) {
   switch (action.type) {
     case "SET_CONFIG":
-      return {
-        ...state,
-        config: { ...state.config, [action.key]: action.val },
-      };
+      return { ...state, config: { ...state.config, [action.key]: action.val } };
     case "START_GAME":
       return dealRound(state);
     case "REVEAL_NEXT":
@@ -49,7 +51,7 @@ function reducer(state, action) {
   }
 }
 
-const SCREENS = {
+const WOLF_SCREENS = {
   SETUP: SetupScreen,
   REVEAL: RevealScreen,
   DISCUSS: DiscussScreen,
@@ -59,13 +61,30 @@ const SCREENS = {
   RESULT: ResultScreen,
 };
 
-export default function App() {
-  const [state, dispatch] = useReducer(reducer, undefined, createInitialState);
-  const Screen = SCREENS[state.phase];
-
+function WordWolfGame({ onBack }) {
+  const [state, dispatch] = useReducer(wolfReducer, undefined, createInitialState);
+  const Screen = WOLF_SCREENS[state.phase];
   return (
-    <div className="app">
-      <Screen state={state} dispatch={dispatch} />
+    <div className="view-enter">
+      <Screen state={state} dispatch={dispatch} onBack={onBack} />
     </div>
   );
+}
+
+// ── Top-level router ─────────────────────────────────────────────────────────
+export default function App() {
+  const [activeGame, setActiveGame] = useState(null);
+
+  if (!activeGame) {
+    return <Dashboard onPlay={setActiveGame} />;
+  }
+
+  const back = () => setActiveGame(null);
+
+  if (activeGame === "wordwolf") return <WordWolfGame onBack={back} />;
+  if (activeGame === "truthordare") return <TruthOrDare onBack={back} />;
+  if (activeGame === "wouldyourather") return <WouldYouRather onBack={back} />;
+  if (activeGame === "mostlikelyto") return <MostLikelyTo onBack={back} />;
+
+  return <Dashboard onPlay={setActiveGame} />;
 }
