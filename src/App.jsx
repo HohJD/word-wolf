@@ -1,53 +1,36 @@
-import { useReducer, useState } from "react";
+import { useReducer, useState } from 'react';
 import {
-  createInitialState,
-  dealRound,
-  revealNext,
-  submitVote,
-  proceedFromReveal,
-  submitWolfGuess,
-  skipVote,
-  playAgain,
-  newSetup,
-} from "./gameEngine";
-import Dashboard from "./Dashboard";
-import SetupScreen from "./screens/SetupScreen";
-import RevealScreen from "./screens/RevealScreen";
-import DiscussScreen from "./screens/DiscussScreen";
-import VoteScreen from "./screens/VoteScreen";
-import RevealRolesScreen from "./screens/RevealRolesScreen";
-import WolfGuessScreen from "./screens/WolfGuessScreen";
-import ResultScreen from "./screens/ResultScreen";
-import TruthOrDare from "./games/TruthOrDare";
-import WouldYouRather from "./games/WouldYouRather";
-import MostLikelyTo from "./games/MostLikelyTo";
-import "./App.css";
+  createInitialState, dealRound, revealNext, submitVote,
+  proceedFromReveal, submitWolfGuess, skipVote, playAgain, newSetup,
+} from './gameEngine';
+import Dashboard from './Dashboard';
+import PlayerSetup from './PlayerSetup';
+import SetupScreen from './screens/SetupScreen';
+import RevealScreen from './screens/RevealScreen';
+import DiscussScreen from './screens/DiscussScreen';
+import VoteScreen from './screens/VoteScreen';
+import RevealRolesScreen from './screens/RevealRolesScreen';
+import WolfGuessScreen from './screens/WolfGuessScreen';
+import ResultScreen from './screens/ResultScreen';
+import TruthOrDare from './games/TruthOrDare';
+import WouldYouRather from './games/WouldYouRather';
+import MostLikelyTo from './games/MostLikelyTo';
+import './App.css';
 
-// ── Word Wolf reducer ────────────────────────────────────────────────────────
+// ── Word Wolf reducer ────────────────────────────────────
 function wolfReducer(state, action) {
   switch (action.type) {
-    case "SET_CONFIG":
-      return { ...state, config: { ...state.config, [action.key]: action.val } };
-    case "START_GAME":
-      return dealRound(state);
-    case "REVEAL_NEXT":
-      return revealNext(state);
-    case "START_VOTE":
-      return { ...state, phase: "VOTE" };
-    case "SUBMIT_VOTE":
-      return submitVote(state, action.votedOutId);
-    case "SKIP_VOTE":
-      return skipVote(state);
-    case "PROCEED_FROM_REVEAL":
-      return proceedFromReveal(state);
-    case "SUBMIT_WOLF_GUESS":
-      return submitWolfGuess(state, action.guess);
-    case "PLAY_AGAIN":
-      return playAgain(state);
-    case "NEW_SETUP":
-      return newSetup(state);
-    default:
-      return state;
+    case 'SET_CONFIG': return { ...state, config: { ...state.config, [action.key]: action.val } };
+    case 'START_GAME': return dealRound(state);
+    case 'REVEAL_NEXT': return revealNext(state);
+    case 'START_VOTE': return { ...state, phase: 'VOTE' };
+    case 'SUBMIT_VOTE': return submitVote(state, action.votedOutId);
+    case 'SKIP_VOTE': return skipVote(state);
+    case 'PROCEED_FROM_REVEAL': return proceedFromReveal(state);
+    case 'SUBMIT_WOLF_GUESS': return submitWolfGuess(state, action.guess);
+    case 'PLAY_AGAIN': return playAgain(state);
+    case 'NEW_SETUP': return newSetup(state);
+    default: return state;
   }
 }
 
@@ -61,30 +44,55 @@ const WOLF_SCREENS = {
   RESULT: ResultScreen,
 };
 
-function WordWolfGame({ onBack }) {
+function WordWolfGame({ onBack, players }) {
   const [state, dispatch] = useReducer(wolfReducer, undefined, createInitialState);
   const Screen = WOLF_SCREENS[state.phase];
   return (
-    <div className="view-enter">
-      <Screen state={state} dispatch={dispatch} onBack={onBack} />
-    </div>
+    <Screen state={state} dispatch={dispatch} onBack={onBack} players={players} />
   );
 }
 
-// ── Top-level router ─────────────────────────────────────────────────────────
+// ── Root ─────────────────────────────────────────────────
 export default function App() {
   const [activeGame, setActiveGame] = useState(null);
+  const [players, setPlayers] = useState([]);
+  const [showPlayerSetup, setShowPlayerSetup] = useState(false);
 
-  if (!activeGame) {
-    return <Dashboard onPlay={setActiveGame} />;
-  }
+  // Background orbs rendered at root so they persist across screens
+  const orbs = (
+    <>
+      <div className="bg-orb bg-orb-1" />
+      <div className="bg-orb bg-orb-2" />
+      <div className="bg-orb bg-orb-3" />
+    </>
+  );
 
   const back = () => setActiveGame(null);
 
-  if (activeGame === "wordwolf") return <WordWolfGame onBack={back} />;
-  if (activeGame === "truthordare") return <TruthOrDare onBack={back} />;
-  if (activeGame === "wouldyourather") return <WouldYouRather onBack={back} />;
-  if (activeGame === "mostlikelyto") return <MostLikelyTo onBack={back} />;
+  return (
+    <div className="app">
+      {orbs}
 
-  return <Dashboard onPlay={setActiveGame} />;
+      {showPlayerSetup && (
+        <PlayerSetup
+          initial={players}
+          onSave={names => { setPlayers(names); setShowPlayerSetup(false); }}
+          onClose={() => setShowPlayerSetup(false)}
+        />
+      )}
+
+      {!activeGame && (
+        <Dashboard
+          onPlay={setActiveGame}
+          players={players}
+          onEditPlayers={() => setShowPlayerSetup(true)}
+        />
+      )}
+
+      {activeGame === 'wordwolf'      && <WordWolfGame  onBack={back} players={players} />}
+      {activeGame === 'truthordare'   && <TruthOrDare   onBack={back} players={players} />}
+      {activeGame === 'wouldyourather'&& <WouldYouRather onBack={back} players={players} />}
+      {activeGame === 'mostlikelyto'  && <MostLikelyTo  onBack={back} players={players} />}
+    </div>
+  );
 }

@@ -1,89 +1,96 @@
+import Avatar from './components/Avatar';
+
 const GAMES = [
   {
-    id: "wordwolf",
-    name: "Word Wolf",
-    icon: "🐺",
-    tagline: "Find the odd one out",
-    players: "3 – 20",
-    tags: ["Deduction", "Bluffing"],
-    gradient: "linear-gradient(135deg, #7c6af5 0%, #c9455a 100%)",
-    glow: "rgba(124,106,245,0.35)",
+    id: 'wordwolf',
+    name: 'Word Wolf',
+    icon: '🐺',
+    tagline: 'Find the odd one out',
+    players: '3 – 20',
+    tags: ['Deduction', 'Bluffing'],
+    bg: 'linear-gradient(145deg,#4c1d95,#9f1239)',
+    glow: 'rgba(139,92,246,0.45)',
     live: true,
   },
   {
-    id: "truthordare",
-    name: "Truth or Dare",
-    icon: "🎲",
-    tagline: "How brave are you?",
-    players: "3+",
-    tags: ["Party", "Daring"],
-    gradient: "linear-gradient(135deg, #f5a623 0%, #e85d75 100%)",
-    glow: "rgba(245,166,35,0.35)",
+    id: 'truthordare',
+    name: 'Truth or Dare',
+    icon: '🎲',
+    tagline: 'How brave are you?',
+    players: '3+',
+    tags: ['Party', 'Daring'],
+    bg: 'linear-gradient(145deg,#92400e,#9f1239)',
+    glow: 'rgba(217,119,6,0.45)',
     live: true,
   },
   {
-    id: "wouldyourather",
-    name: "Would You Rather",
-    icon: "🤔",
-    tagline: "Impossible choices",
-    players: "2+",
-    tags: ["Debate", "Casual"],
-    gradient: "linear-gradient(135deg, #0099f7 0%, #4ecb7b 100%)",
-    glow: "rgba(0,153,247,0.35)",
+    id: 'wouldyourather',
+    name: 'Would You Rather',
+    icon: '🤔',
+    tagline: 'Impossible choices',
+    players: '2+',
+    tags: ['Debate', 'Casual'],
+    bg: 'linear-gradient(145deg,#0e7490,#065f46)',
+    glow: 'rgba(6,182,212,0.45)',
     live: true,
   },
   {
-    id: "mostlikelyto",
-    name: "Most Likely To",
-    icon: "👆",
+    id: 'mostlikelyto',
+    name: 'Most Likely To',
+    icon: '👆',
     tagline: "Who would actually do it?",
-    players: "4+",
-    tags: ["Chaotic", "Social"],
-    gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-    glow: "rgba(240,147,251,0.35)",
+    players: '4+',
+    tags: ['Chaotic', 'Social'],
+    bg: 'linear-gradient(145deg,#86198f,#4c1d95)',
+    glow: 'rgba(168,85,247,0.45)',
     live: true,
   },
   {
-    id: "hottakes",
-    name: "Hot Takes",
-    icon: "🔥",
-    tagline: "Defend your opinion",
-    players: "3+",
-    tags: ["Debate", "Spicy"],
-    gradient: "linear-gradient(135deg, #333 0%, #1a1a1a 100%)",
-    glow: "transparent",
+    id: 'hottakes',
+    name: 'Hot Takes',
+    icon: '🔥',
+    tagline: 'Defend your opinion',
+    players: '3+',
+    tags: ['Debate', 'Spicy'],
+    bg: 'linear-gradient(145deg,#1c1c2e,#12121e)',
+    glow: 'transparent',
     live: false,
   },
   {
-    id: "alias",
-    name: "Alias",
-    icon: "🗣️",
-    tagline: "Describe without saying the word",
-    players: "4+",
-    tags: ["Team", "Fast-paced"],
-    gradient: "linear-gradient(135deg, #2a2a3a 0%, #1a1a28 100%)",
-    glow: "transparent",
+    id: 'alias',
+    name: 'Alias',
+    icon: '🗣️',
+    tagline: 'Describe without saying the word',
+    players: '4+',
+    tags: ['Team', 'Fast'],
+    bg: 'linear-gradient(145deg,#1c1c2e,#12121e)',
+    glow: 'transparent',
     live: false,
   },
   {
-    id: "mafia",
-    name: "Mafia",
-    icon: "🕵️",
-    tagline: "Classic social deduction",
-    players: "6+",
-    tags: ["Deduction", "Strategy"],
-    gradient: "linear-gradient(135deg, #2a2a3a 0%, #1a1a28 100%)",
-    glow: "transparent",
+    id: 'mafia',
+    name: 'Mafia',
+    icon: '🕵️',
+    tagline: 'Classic social deduction',
+    players: '6+',
+    tags: ['Strategy', 'Deduction'],
+    bg: 'linear-gradient(145deg,#1c1c2e,#12121e)',
+    glow: 'transparent',
     live: false,
   },
 ];
 
-export default function Dashboard({ onPlay }) {
-  const live = GAMES.filter((g) => g.live);
-  const soon = GAMES.filter((g) => !g.live);
+export default function Dashboard({ onPlay, players, onEditPlayers }) {
+  const live = GAMES.filter(g => g.live);
+  const soon = GAMES.filter(g => !g.live);
 
   return (
     <div className="dashboard view-enter">
+      {/* Ambient orbs */}
+      <div className="bg-orb bg-orb-1" />
+      <div className="bg-orb bg-orb-2" />
+      <div className="bg-orb bg-orb-3" />
+
       <div className="dash-header">
         <div className="dash-brand">
           <span className="dash-brand-icon">🎮</span>
@@ -94,24 +101,39 @@ export default function Dashboard({ onPlay }) {
         </div>
       </div>
 
+      {/* Player row */}
+      <div className="dash-players-row">
+        <span className="dash-players-label">Players</span>
+        <div className="dash-players-chips">
+          {players.length === 0 ? (
+            <span className="dash-no-players">No players set</span>
+          ) : (
+            players.map(name => (
+              <div key={name} className="player-chip">
+                <Avatar name={name} size={22} />
+                <span>{name}</span>
+              </div>
+            ))
+          )}
+        </div>
+        <button className="edit-players-btn" onClick={onEditPlayers}>
+          {players.length === 0 ? '+ Add' : 'Edit'}
+        </button>
+      </div>
+
       <section className="dash-section">
-        <h2 className="dash-section-title">Play Now</h2>
+        <p className="dash-section-title">Play Now</p>
         <div className="game-grid">
-          {live.map((game) => (
+          {live.map(game => (
             <button
               key={game.id}
               className="game-card"
-              style={{
-                background: game.gradient,
-                "--glow": game.glow,
-              }}
+              style={{ background: game.bg, '--card-glow': game.glow }}
               onClick={() => onPlay(game.id)}
             >
               <div className="gc-top">
                 <span className="gc-icon">{game.icon}</span>
-                <div className="gc-badges">
-                  <span className="gc-live-badge">LIVE</span>
-                </div>
+                <span className="gc-live-badge">LIVE</span>
               </div>
               <div className="gc-body">
                 <p className="gc-name">{game.name}</p>
@@ -120,11 +142,7 @@ export default function Dashboard({ onPlay }) {
               <div className="gc-footer">
                 <span className="gc-players">👥 {game.players}</span>
                 <div className="gc-tags">
-                  {game.tags.map((t) => (
-                    <span key={t} className="gc-tag">
-                      {t}
-                    </span>
-                  ))}
+                  {game.tags.map(t => <span key={t} className="gc-tag">{t}</span>)}
                 </div>
               </div>
             </button>
@@ -133,32 +151,24 @@ export default function Dashboard({ onPlay }) {
       </section>
 
       <section className="dash-section">
-        <h2 className="dash-section-title">Coming Soon</h2>
+        <p className="dash-section-title">Coming Soon</p>
         <div className="game-grid">
-          {soon.map((game) => (
+          {soon.map(game => (
             <div
               key={game.id}
               className="game-card game-card--soon"
-              style={{ background: game.gradient }}
+              style={{ background: game.bg }}
             >
               <div className="gc-top">
-                <span className="gc-icon" style={{ opacity: 0.4 }}>
-                  {game.icon}
-                </span>
+                <span className="gc-icon" style={{ opacity: 0.35 }}>{game.icon}</span>
                 <span className="gc-soon-badge">SOON</span>
               </div>
               <div className="gc-body">
-                <p className="gc-name" style={{ opacity: 0.5 }}>
-                  {game.name}
-                </p>
-                <p className="gc-tagline" style={{ opacity: 0.35 }}>
-                  {game.tagline}
-                </p>
+                <p className="gc-name" style={{ opacity: 0.4 }}>{game.name}</p>
+                <p className="gc-tagline" style={{ opacity: 0.3 }}>{game.tagline}</p>
               </div>
               <div className="gc-footer">
-                <span className="gc-players" style={{ opacity: 0.35 }}>
-                  👥 {game.players}
-                </span>
+                <span className="gc-players" style={{ opacity: 0.3 }}>👥 {game.players}</span>
               </div>
             </div>
           ))}
