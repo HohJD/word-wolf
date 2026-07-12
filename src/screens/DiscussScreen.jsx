@@ -44,7 +44,7 @@ export default function DiscussScreen({ state, dispatch }) {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
       osc.start();
       osc.stop(ctx.currentTime + 0.8);
-    } catch (_) {}
+    } catch {}
   }
 
   const pct = remaining / total;

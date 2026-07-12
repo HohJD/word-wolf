@@ -54,7 +54,6 @@ export default function WouldYouRather({ onBack, players }) {
   // ── totals across history ─────────────────────────────
   const totalA = history.reduce((s, r) => s + r.a, 0);
   const totalB = history.reduce((s, r) => s + r.b, 0);
-  const totalVotes = totalA + totalB || 1;
 
   // current round result
   const curA = Object.values(votes).filter(v => v === 'a').length;

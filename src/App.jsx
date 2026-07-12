@@ -15,6 +15,9 @@ import ResultScreen from './screens/ResultScreen';
 import TruthOrDare from './games/TruthOrDare';
 import WouldYouRather from './games/WouldYouRather';
 import MostLikelyTo from './games/MostLikelyTo';
+import HotTakes from './games/HotTakes';
+import Alias from './games/Alias';
+import HelpModal from './components/HelpModal';
 import './App.css';
 
 // ── Word Wolf reducer ────────────────────────────────────
@@ -57,6 +60,8 @@ export default function App() {
   const [activeGame, setActiveGame] = useState(null);
   const [players, setPlayers] = useState([]);
   const [showPlayerSetup, setShowPlayerSetup] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [helpContext, setHelpContext] = useState('app');
 
   // Background orbs rendered at root so they persist across screens
   const orbs = (
@@ -69,9 +74,28 @@ export default function App() {
 
   const back = () => setActiveGame(null);
 
+  const openHelp = (ctx) => {
+    setHelpContext(ctx);
+    setShowHelp(true);
+  };
+
   return (
     <div className="app">
       {orbs}
+
+      {showHelp && (
+        <HelpModal context={helpContext} onClose={() => setShowHelp(false)} />
+      )}
+
+      {activeGame && (
+        <button
+          className="help-fab"
+          onClick={() => openHelp(activeGame)}
+          aria-label="Help"
+        >
+          ?
+        </button>
+      )}
 
       {showPlayerSetup && (
         <PlayerSetup
@@ -86,6 +110,7 @@ export default function App() {
           onPlay={setActiveGame}
           players={players}
           onEditPlayers={() => setShowPlayerSetup(true)}
+          onHelp={() => openHelp('app')}
         />
       )}
 
@@ -93,6 +118,8 @@ export default function App() {
       {activeGame === 'truthordare'   && <TruthOrDare   onBack={back} players={players} />}
       {activeGame === 'wouldyourather'&& <WouldYouRather onBack={back} players={players} />}
       {activeGame === 'mostlikelyto'  && <MostLikelyTo  onBack={back} players={players} />}
+      {activeGame === 'hottakes'      && <HotTakes      onBack={back} players={players} />}
+      {activeGame === 'alias'         && <Alias         onBack={back} players={players} />}
     </div>
   );
 }

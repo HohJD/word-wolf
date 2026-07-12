@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { content } from './truthOrDareContent';
 import Avatar from '../components/Avatar';
+import PlayerSpinner from '../components/PlayerSpinner';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -23,7 +24,7 @@ export default function TruthOrDare({ onBack, players }) {
   const [card, setCard] = useState('');
   const [playerIdx, setPlayerIdx] = useState(0);
   const [counts, setCounts] = useState({ truth: 0, dare: 0 });
-  const [decks, setDecks] = useState({
+  const [, setDecks] = useState({
     mild:  { truths: shuffle(content.mild.truths),  dares: shuffle(content.mild.dares) },
     spicy: { truths: shuffle(content.spicy.truths), dares: shuffle(content.spicy.dares) },
     wild:  { truths: shuffle(content.wild.truths),  dares: shuffle(content.wild.dares) },
@@ -33,7 +34,6 @@ export default function TruthOrDare({ onBack, players }) {
 
   const draw = useCallback((type) => {
     const src = content[difficulty][type === 'truth' ? 'truths' : 'dares'];
-    const key = `${difficulty}-${type}s`;
     setDecks(prev => {
       const deck = prev[difficulty][type === 'truth' ? 'truths' : 'dares'];
       const remaining = deck.length > 0 ? deck : shuffle(src);
@@ -55,8 +55,6 @@ export default function TruthOrDare({ onBack, players }) {
     if (players.length > 0) setPlayerIdx(i => i + 1);
     setPhase('pick');
   }
-
-  const diff = DIFFICULTIES.find(d => d.key === difficulty);
 
   return (
     <div className="screen td-screen view-enter">
@@ -95,6 +93,20 @@ export default function TruthOrDare({ onBack, players }) {
               <p className="td-sub">How brave are you?</p>
             )}
           </div>
+
+          {players.length > 2 && (
+            <div className="td-spinner-row">
+              <PlayerSpinner
+                players={players}
+                size={80}
+                onComplete={name => {
+                  const idx = players.indexOf(name);
+                  if (idx !== -1) setPlayerIdx(idx);
+                }}
+              />
+              <span className="td-spinner-label">Spin to pick a victim</span>
+            </div>
+          )}
 
           <div className="td-choices">
             <button className="td-choice truth" onClick={() => draw('truth')}>

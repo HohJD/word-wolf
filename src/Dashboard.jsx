@@ -52,9 +52,9 @@ const GAMES = [
     tagline: 'Defend your opinion',
     players: '3+',
     tags: ['Debate', 'Spicy'],
-    bg: 'linear-gradient(145deg,#1c1c2e,#12121e)',
-    glow: 'transparent',
-    live: false,
+    bg: 'linear-gradient(145deg,#ea580c,#7c2d12)',
+    glow: 'rgba(234,88,12,0.45)',
+    live: true,
   },
   {
     id: 'alias',
@@ -63,9 +63,9 @@ const GAMES = [
     tagline: 'Describe without saying the word',
     players: '4+',
     tags: ['Team', 'Fast'],
-    bg: 'linear-gradient(145deg,#1c1c2e,#12121e)',
-    glow: 'transparent',
-    live: false,
+    bg: 'linear-gradient(145deg,#2563eb,#7c3aed)',
+    glow: 'rgba(37,99,235,0.45)',
+    live: true,
   },
   {
     id: 'mafia',
@@ -80,7 +80,7 @@ const GAMES = [
   },
 ];
 
-export default function Dashboard({ onPlay, players, onEditPlayers }) {
+export default function Dashboard({ onPlay, players, onEditPlayers, onHelp }) {
   const live = GAMES.filter(g => g.live);
   const soon = GAMES.filter(g => !g.live);
 
@@ -99,6 +99,7 @@ export default function Dashboard({ onPlay, players, onEditPlayers }) {
             <p className="dash-sub">Party game collection</p>
           </div>
         </div>
+        <button className="help-btn" onClick={onHelp} aria-label="Help">?</button>
       </div>
 
       {/* Player row */}
