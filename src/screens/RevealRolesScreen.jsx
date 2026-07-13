@@ -1,10 +1,17 @@
-export default function RevealRolesScreen({ state, dispatch }) {
+import Avatar from '../components/Avatar';
+
+export default function RevealRolesScreen({ state, dispatch, players }) {
   const { round } = state;
   const votedOut = round.players.find((p) => p.id === round.votedOutId);
-  const isWolfOut = votedOut?.role === "wolf";
+  const isWolfOut = votedOut?.role === 'wolf';
+  const isBlankMode = round.wolfMode === 'blank';
+
+  function nameFor(p) {
+    return players?.[p.id - 1] || `Player ${p.id}`;
+  }
 
   return (
-    <div className="screen reveal-roles-screen">
+    <div className="screen reveal-roles-screen view-enter">
       <h2 className="screen-title">Roles Revealed</h2>
 
       <div className="word-reveal-pair">
@@ -15,7 +22,7 @@ export default function RevealRolesScreen({ state, dispatch }) {
         <div className="word-reveal-divider">vs</div>
         <div className="word-reveal-item wolf-side">
           <p className="role-label">Wolf had</p>
-          <p className="revealed-word">{round.wolfWord}</p>
+          <p className="revealed-word">{isBlankMode ? '⬜ Blank' : round.wolfWord}</p>
         </div>
       </div>
 
@@ -23,12 +30,14 @@ export default function RevealRolesScreen({ state, dispatch }) {
         {round.players.map((p) => (
           <div
             key={p.id}
-            className={`role-row ${p.role} ${p.id === round.votedOutId ? "voted-out" : ""}`}
+            className={`role-row ${p.role} ${p.id === round.votedOutId ? 'voted-out' : ''}`}
           >
-            <span className="role-num">P{p.id}</span>
-            <span className="role-word">{p.word}</span>
+            <Avatar name={nameFor(p)} size={28} />
+            <span className="role-word">{nameFor(p)}</span>
             <span className="role-badge">
-              {p.role === "wolf" ? "🐺 Wolf" : p.role === "blank" ? "❓ Blank" : "👤 Villager"}
+              {p.role === 'wolf'
+                ? isBlankMode ? '🐺 Wolf (blank)' : '🐺 Wolf'
+                : '👤 Villager'}
             </span>
             {p.id === round.votedOutId && (
               <span className="voted-badge">VOTED OUT</span>
@@ -51,8 +60,11 @@ export default function RevealRolesScreen({ state, dispatch }) {
         </div>
       )}
 
-      <button className="btn-primary" onClick={() => dispatch({ type: "PROCEED_FROM_REVEAL" })}>
-        {isWolfOut ? "Wolf's Last Chance →" : "See Result →"}
+      <button
+        className="btn-primary"
+        onClick={() => dispatch({ type: 'PROCEED_FROM_REVEAL' })}
+      >
+        {isWolfOut ? 'Wolf\'s Last Chance →' : 'See Result →'}
       </button>
     </div>
   );

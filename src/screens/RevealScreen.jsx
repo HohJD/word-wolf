@@ -10,7 +10,12 @@ export default function RevealScreen({ state, dispatch, players }) {
   const total = round.players.length;
   const current = round.revealIndex + 1;
   const playerName = players?.[player.id - 1] || `Player ${current}`;
-  const nextName = players?.[round.players[round.revealIndex + 1]?.id - 1] || `Player ${current + 1}`;
+  const nextPlayer = round.players[round.revealIndex + 1];
+  const nextName = nextPlayer
+    ? players?.[nextPlayer.id - 1] || `Player ${current + 1}`
+    : null;
+
+  const isBlankWolf = player.role === 'wolf' && round.wolfMode === 'blank';
 
   useEffect(() => {
     setShowing(false);
@@ -40,13 +45,25 @@ export default function RevealScreen({ state, dispatch, players }) {
         <p className="step-label">{playerName} — {current} of {total}</p>
       </div>
 
-      <div className="word-card" onClick={showing ? handleHide : handleReveal}>
+      <div
+        className={`word-card${isBlankWolf && showing ? ' word-card--blank-wolf' : ''}`}
+        onClick={showing ? handleHide : handleReveal}
+      >
         {showing ? (
-          <div className="word-reveal">
-            <p className="word-label">Your word is</p>
-            <p className="word-text">{player.word}</p>
-            <p className="word-hint">Tap to hide</p>
-          </div>
+          isBlankWolf ? (
+            <div className="word-reveal word-reveal--blank">
+              <span className="blank-wolf-icon">🐺</span>
+              <p className="blank-wolf-title">You are the Wolf!</p>
+              <p className="blank-wolf-sub">You have no word — listen carefully and blend in.</p>
+              <p className="word-hint" style={{ marginTop: 14 }}>Tap to hide</p>
+            </div>
+          ) : (
+            <div className="word-reveal">
+              <p className="word-label">Your word is</p>
+              <p className="word-text">{player.word}</p>
+              <p className="word-hint">Tap to hide</p>
+            </div>
+          )
         ) : (
           <div className="word-hidden">
             <span className="eye-icon">👁</span>
@@ -61,7 +78,7 @@ export default function RevealScreen({ state, dispatch, players }) {
       </div>
 
       {showing && (
-        <button className="btn-secondary" onClick={handleHide}>Hide word</button>
+        <button className="btn-secondary" onClick={handleHide}>Hide</button>
       )}
       {!showing && (
         <button className="btn-primary" onClick={() => dispatch({ type: 'REVEAL_NEXT' })}>

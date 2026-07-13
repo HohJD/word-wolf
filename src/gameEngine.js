@@ -22,7 +22,7 @@ export function createInitialState() {
       wolfCount: 1,
       category: "Food & Drink",
       timerSeconds: 180,
-      blankCardEnabled: false,
+      wolfMode: "word", // "word" | "blank"
     },
     round: null,
     usedPairs: [],
@@ -37,23 +37,14 @@ export function dealRound(state) {
   const wolfIndices = pickRandom(config.playerCount, config.wolfCount);
   wolfIndices.forEach((i) => (roles[i] = "wolf"));
 
-  let blankIndex = -1;
-  if (config.blankCardEnabled && config.playerCount > config.wolfCount + 1) {
-    const available = roles
-      .map((r, i) => (r === "villager" ? i : -1))
-      .filter((i) => i >= 0);
-    blankIndex = available[Math.floor(Math.random() * available.length)];
-    roles[blankIndex] = "blank";
-  }
-
   const players = roles.map((role, i) => ({
     id: i + 1,
     role,
     word:
       role === "wolf"
-        ? pair.wolf
-        : role === "blank"
-        ? "???"
+        ? config.wolfMode === "blank"
+          ? "???"
+          : pair.wolf
         : pair.villager,
     revealed: false,
   }));
@@ -63,7 +54,8 @@ export function dealRound(state) {
     phase: "REVEAL",
     round: {
       villagerWord: pair.villager,
-      wolfWord: pair.wolf,
+      wolfWord: pair.wolf,         // always stored for the result reveal
+      wolfMode: config.wolfMode,   // carried into round for display logic
       players: shuffle(players).map((p, i) => ({ ...p, id: i + 1 })),
       revealIndex: 0,
       votedOutId: null,
@@ -100,7 +92,7 @@ export function proceedFromReveal(state) {
   if (votedOut && votedOut.role === "wolf") {
     return { ...state, phase: "WOLF_GUESS" };
   }
-  const winner = determineWinner(state, null);
+  const winner = determineWinner(state);
   return { ...state, phase: "RESULT", round: { ...round, winner } };
 }
 
@@ -116,20 +108,19 @@ export function submitWolfGuess(state, guess) {
   };
 }
 
-function determineWinner(state, _guess) {
+function determineWinner(state) {
   const { round } = state;
   const votedOut = round.players.find((p) => p.id === round.votedOutId);
-  if (!votedOut) return "wolves"; // no one voted out = wolves survive
+  if (!votedOut) return "wolves";
   if (votedOut.role === "wolf") return "villagers";
   return "wolves";
 }
 
 export function skipVote(state) {
-  const winner = "wolves";
   return {
     ...state,
     phase: "RESULT",
-    round: { ...state.round, winner },
+    round: { ...state.round, winner: "wolves" },
   };
 }
 
