@@ -131,16 +131,7 @@ export const wordLibrary = [
   {
     category: "Fun 🎉",
     pairs: [
-      { villager: "Homework", wolf: "Exam" },
-      { villager: "Ice cream", wolf: "Gelato" },
-      { villager: "Nap", wolf: "Sleep" },
-      { villager: "Holiday", wolf: "Weekend" },
-      { villager: "Prank", wolf: "Dare" },
-      { villager: "Gossip", wolf: "Rumour" },
-      { villager: "Gift", wolf: "Surprise" },
-      { villager: "Crush", wolf: "Bestie" },
-      { villager: "Meme", wolf: "Joke" },
-      { villager: "Party", wolf: "Hangout" },
+      { villager: "Homework", wolf: "Ice cream" },
     ],
   },
   {

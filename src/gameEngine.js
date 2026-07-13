@@ -49,14 +49,22 @@ export function dealRound(state) {
     revealed: false,
   }));
 
+  // Shuffle then guarantee first revealer is never the wolf
+  let ordered = shuffle(players);
+  if (ordered[0].role === 'wolf') {
+    const swapIdx = ordered.findIndex((p) => p.role !== 'wolf');
+    if (swapIdx > 0) [ordered[0], ordered[swapIdx]] = [ordered[swapIdx], ordered[0]];
+  }
+  ordered = ordered.map((p, i) => ({ ...p, id: i + 1 }));
+
   return {
     ...state,
     phase: "REVEAL",
     round: {
       villagerWord: pair.villager,
-      wolfWord: pair.wolf,         // always stored for the result reveal
-      wolfMode: config.wolfMode,   // carried into round for display logic
-      players: shuffle(players).map((p, i) => ({ ...p, id: i + 1 })),
+      wolfWord: pair.wolf,
+      wolfMode: config.wolfMode,
+      players: ordered,
       revealIndex: 0,
       votedOutId: null,
       wolfGuess: null,
