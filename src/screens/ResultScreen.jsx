@@ -1,7 +1,7 @@
 import Confetti from '../components/Confetti';
 import Avatar from '../components/Avatar';
 
-export default function ResultScreen({ state, dispatch, players }) {
+export default function ResultScreen({ state, dispatch, players, onBack }) {
   const { round } = state;
   const wolves = round.players.filter(p => p.role === 'wolf');
   const villagers = round.players.filter(p => p.role === 'villager');
@@ -74,6 +74,9 @@ export default function ResultScreen({ state, dispatch, players }) {
         </button>
         <button className="btn-secondary" onClick={() => dispatch({ type: 'NEW_SETUP' })}>
           Change settings
+        </button>
+        <button className="btn-ghost" onClick={onBack}>
+          🏠 Home
         </button>
       </div>
     </div>

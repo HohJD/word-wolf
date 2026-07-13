@@ -6,7 +6,7 @@ function formatTime(s) {
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
-export default function DiscussScreen({ state, dispatch }) {
+export default function DiscussScreen({ state, dispatch, onBack }) {
   const total = state.config.timerSeconds;
   const [remaining, setRemaining] = useState(total);
   const [running, setRunning] = useState(true);
@@ -22,9 +22,7 @@ export default function DiscussScreen({ state, dispatch }) {
             chimeRef.current = true;
             playChime();
           }
-          if (next <= 0) {
-            setRunning(false);
-          }
+          if (next <= 0) setRunning(false);
           return Math.max(0, next);
         });
       }, 1000);
@@ -55,28 +53,24 @@ export default function DiscussScreen({ state, dispatch }) {
   const circ = 2 * Math.PI * radius;
 
   return (
-    <div className="screen discuss-screen">
+    <div className="screen discuss-screen view-enter">
+      <div className="game-topbar">
+        <button className="back-btn" onClick={onBack}>🏠 Home</button>
+      </div>
+
       <h2 className="screen-title">Discussion</h2>
-      <p className="screen-sub">
-        Describe your word without saying it. Find the wolf!
-      </p>
+      <p className="screen-sub">Describe your word without saying it. Find the wolf!</p>
 
       <div className="timer-wrap">
         <svg className="timer-svg" viewBox="0 0 200 200">
           <circle
-            cx="100"
-            cy="100"
-            r={radius}
-            fill="none"
-            stroke="var(--surface2)"
-            strokeWidth="10"
+            cx="100" cy="100" r={radius}
+            fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="10"
           />
           <circle
-            cx="100"
-            cy="100"
-            r={radius}
+            cx="100" cy="100" r={radius}
             fill="none"
-            stroke={done ? "var(--error)" : urgent ? "var(--warn)" : "var(--accent)"}
+            stroke={done ? "var(--rose)" : urgent ? "var(--amber)" : "var(--violet)"}
             strokeWidth="10"
             strokeDasharray={circ}
             strokeDashoffset={circ * (1 - pct)}
@@ -91,23 +85,14 @@ export default function DiscussScreen({ state, dispatch }) {
       </div>
 
       <div className="btn-row">
-        <button
-          className="btn-ghost"
-          onClick={() => setRunning((r) => !r)}
-          disabled={done}
-        >
+        <button className="btn-ghost" onClick={() => setRunning((r) => !r)} disabled={done}>
           {running ? "⏸ Pause" : "▶ Resume"}
         </button>
       </div>
 
-      {(done) && (
-        <p className="time-up-msg">Put the phone down and vote!</p>
-      )}
+      {done && <p className="time-up-msg">Put the phone down and vote!</p>}
 
-      <button
-        className="btn-primary"
-        onClick={() => dispatch({ type: "START_VOTE" })}
-      >
+      <button className="btn-primary" onClick={() => dispatch({ type: "START_VOTE" })}>
         Vote now →
       </button>
     </div>

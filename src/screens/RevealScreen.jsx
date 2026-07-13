@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Avatar from '../components/Avatar';
 
-export default function RevealScreen({ state, dispatch, players }) {
+export default function RevealScreen({ state, dispatch, players, onBack }) {
   const { round } = state;
   const player = round.players[round.revealIndex];
   const [showing, setShowing] = useState(false);
@@ -36,8 +36,11 @@ export default function RevealScreen({ state, dispatch, players }) {
 
   return (
     <div className="screen reveal-screen view-enter">
-      <div className="progress-bar">
-        <div className="progress-fill" style={{ width: `${(current / total) * 100}%` }} />
+      <div className="game-topbar">
+        <button className="back-btn" onClick={onBack}>🏠 Home</button>
+        <div className="progress-bar" style={{ flex: 1 }}>
+          <div className="progress-fill" style={{ width: `${(current / total) * 100}%` }} />
+        </div>
       </div>
 
       <div className="reveal-player-row">

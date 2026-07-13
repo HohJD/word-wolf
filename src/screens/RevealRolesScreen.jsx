@@ -1,6 +1,6 @@
 import Avatar from '../components/Avatar';
 
-export default function RevealRolesScreen({ state, dispatch, players }) {
+export default function RevealRolesScreen({ state, dispatch, players, onBack }) {
   const { round } = state;
   const votedOut = round.players.find((p) => p.id === round.votedOutId);
   const isWolfOut = votedOut?.role === 'wolf';
@@ -12,6 +12,10 @@ export default function RevealRolesScreen({ state, dispatch, players }) {
 
   return (
     <div className="screen reveal-roles-screen view-enter">
+      <div className="game-topbar">
+        <button className="back-btn" onClick={onBack}>🏠 Home</button>
+      </div>
+
       <h2 className="screen-title">Roles Revealed</h2>
 
       <div className="word-reveal-pair">
@@ -60,11 +64,8 @@ export default function RevealRolesScreen({ state, dispatch, players }) {
         </div>
       )}
 
-      <button
-        className="btn-primary"
-        onClick={() => dispatch({ type: 'PROCEED_FROM_REVEAL' })}
-      >
-        {isWolfOut ? 'Wolf\'s Last Chance →' : 'See Result →'}
+      <button className="btn-primary" onClick={() => dispatch({ type: 'PROCEED_FROM_REVEAL' })}>
+        {isWolfOut ? "Wolf's Last Chance →" : 'See Result →'}
       </button>
     </div>
   );
