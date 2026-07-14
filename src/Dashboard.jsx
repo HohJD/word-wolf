@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import Avatar from './components/Avatar';
 
 const GAMES = [
@@ -81,6 +82,19 @@ const GAMES = [
 ];
 
 export default function Dashboard({ onPlay, players, onEditPlayers, onHelp }) {
+  const wordWolfTaglines = [
+    'Can you spot the wolf?',
+    "Who's bluffing tonight?",
+    'One word is different...',
+    'Sneak, bluff, and guess!',
+    'Keep your poker face ready',
+    'Trust no one (except snacks)',
+  ];
+
+  const randomWordWolfTag = useMemo(() => {
+    return wordWolfTaglines[Math.floor(Math.random() * wordWolfTaglines.length)];
+  }, []);
+
   const live = GAMES.filter(g => g.live);
   const soon = GAMES.filter(g => !g.live);
 
@@ -100,6 +114,17 @@ export default function Dashboard({ onPlay, players, onEditPlayers, onHelp }) {
           </div>
         </div>
         <button className="help-btn" onClick={onHelp} aria-label="Help">?</button>
+      </div>
+
+      <div className="dash-hero">
+        <div className="dash-hero-left">
+          <div className="dash-hero-emoji">🐺🎉</div>
+          <div>
+            <h2 className="dash-hero-title">Party games, big vibes</h2>
+            <p className="dash-hero-tagline">{randomWordWolfTag}</p>
+          </div>
+        </div>
+        <button className="btn-primary" onClick={() => onPlay('wordwolf')}>Play Word Wolf</button>
       </div>
 
       {/* Player row */}

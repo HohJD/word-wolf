@@ -337,6 +337,27 @@ body {
 }
 .dash-sub { font-size: 13px; color: var(--text-3); margin-top: 3px; }
 
+/* ── Dashboard hero ── */
+.dash-hero {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 14px; border-radius: var(--r-md);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.dash-hero-left { display: flex; align-items: center; gap: 12px; }
+.dash-hero-emoji { font-size: 36px; filter: drop-shadow(0 6px 18px rgba(255,255,255,0.06)); }
+.dash-hero-title { font-size: 16px; font-weight: 900; margin: 0; color: #fff; }
+.dash-hero-tagline {
+  font-size: 13px; color: var(--text-2); margin-top: 4px;
+  background: linear-gradient(90deg, #ffd166, #ff6b6b, #9b8cff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: taglineFloat 6s ease-in-out infinite;
+}
+@keyframes taglineFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
 /* Player row */
 .dash-players-row {
   display: flex; align-items: center; gap: 10px;
