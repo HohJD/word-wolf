@@ -1,21 +1,25 @@
 import { useState } from 'react';
 import Avatar from '../components/Avatar';
 
-export default function VoteScreen({ state, dispatch, players }) {
+export default function VoteScreen({ state, dispatch, players, onBack }) {
   const { round } = state;
   const [selected, setSelected] = useState(null);
+
+  function nameFor(p) {
+    return players?.[p.id - 1] || `Player ${p.id}`;
+  }
 
   function handleSubmit() {
     if (selected === 'nobody') dispatch({ type: 'SKIP_VOTE' });
     else dispatch({ type: 'SUBMIT_VOTE', votedOutId: selected });
   }
 
-  function nameFor(p) {
-    return players?.[p.id - 1] || `Player ${p.id}`;
-  }
-
   return (
     <div className="screen vote-screen view-enter">
+      <div className="game-topbar">
+        <button className="back-btn" onClick={onBack}>🏠 Home</button>
+      </div>
+
       <h2 className="screen-title">Vote</h2>
       <p className="screen-sub">Who do you think is the 🐺 Wolf?</p>
 

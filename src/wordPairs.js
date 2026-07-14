@@ -129,6 +129,12 @@ export const wordLibrary = [
     ],
   },
   {
+    category: "Fun 🎉",
+    pairs: [
+      { villager: "Homework", wolf: "Ice cream" },
+    ],
+  },
+  {
     category: "Malaysia / Local 🇲🇾",
     pairs: [
       { villager: "Nasi lemak", wolf: "Nasi goreng" },

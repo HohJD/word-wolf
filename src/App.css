@@ -857,6 +857,36 @@ body {
 .mlt-lb-name { flex: 1; }
 .mlt-lb-pts { font-weight: 900; color: var(--pink); }
 
+/* ── Wolf mode selector ── */
+.wolf-mode-row { display: flex; gap: 10px; }
+.wolf-mode-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 14px 10px; border-radius: var(--r-md);
+  border: 1.5px solid var(--border); background: var(--glass);
+  color: var(--text-2); cursor: pointer;
+  transition: all 0.18s var(--bounce);
+}
+.wolf-mode-btn:hover { border-color: var(--border-hi); color: var(--text); background: var(--glass-2); }
+.wolf-mode-btn.active {
+  border-color: var(--violet); background: rgba(139,92,246,0.12); color: var(--text);
+  box-shadow: 0 0 18px var(--violet-glow);
+}
+.wolf-mode-icon { font-size: 26px; }
+.wolf-mode-label { font-size: 13px; font-weight: 800; }
+.wolf-mode-desc { font-size: 11px; color: var(--text-3); text-align: center; line-height: 1.4; }
+.wolf-mode-btn.active .wolf-mode-desc { color: rgba(167,139,250,0.7); }
+
+/* ── Blank wolf card ── */
+.word-card--blank-wolf {
+  border-color: var(--rose);
+  background: rgba(244,63,94,0.06);
+  box-shadow: 0 0 36px rgba(244,63,94,0.22);
+}
+.word-reveal--blank { text-align: center; padding: 28px 20px; }
+.blank-wolf-icon { font-size: 56px; display: block; margin-bottom: 12px; filter: drop-shadow(0 0 24px rgba(244,63,94,0.55)); animation: iconPulse 2s ease-in-out infinite; }
+.blank-wolf-title { font-size: 22px; font-weight: 900; color: #f87171; margin-bottom: 8px; }
+.blank-wolf-sub { font-size: 14px; color: var(--text-2); line-height: 1.5; max-width: 240px; margin-inline: auto; }
+
 /* ── Responsive desktop ── */
 @media (min-width: 520px) {
   .app { box-shadow: 0 0 80px rgba(0,0,0,0.6); }

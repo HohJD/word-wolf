@@ -1,8 +1,11 @@
 import { useState } from "react";
 
-export default function WolfGuessScreen({ state, dispatch }) {
+export default function WolfGuessScreen({ state, dispatch, players, onBack }) {
   const { round } = state;
   const votedOut = round.players.find((p) => p.id === round.votedOutId);
+  const wolfName = votedOut
+    ? players?.[votedOut.id - 1] || `Player ${votedOut.id}`
+    : 'The Wolf';
   const [guess, setGuess] = useState("");
 
   function handleSubmit(e) {
@@ -12,13 +15,15 @@ export default function WolfGuessScreen({ state, dispatch }) {
   }
 
   return (
-    <div className="screen wolf-guess-screen">
+    <div className="screen wolf-guess-screen view-enter">
+      <div className="game-topbar" style={{ width: '100%', alignSelf: 'flex-start' }}>
+        <button className="back-btn" onClick={onBack}>🏠 Home</button>
+      </div>
+
       <div className="wolf-moment">
         <span className="big-wolf">🐺</span>
         <h2>Wolf's Last Chance</h2>
-        <p>
-          Player {votedOut?.id} — you were caught. Guess the Villagers' word to steal the win!
-        </p>
+        <p>{wolfName} — you were caught. Guess the Villagers' word to steal the win!</p>
       </div>
 
       <form onSubmit={handleSubmit} className="guess-form">
@@ -35,9 +40,7 @@ export default function WolfGuessScreen({ state, dispatch }) {
         </button>
       </form>
 
-      <p className="guess-hint">
-        One guess only. Think carefully!
-      </p>
+      <p className="guess-hint">One guess only. Think carefully!</p>
     </div>
   );
 }

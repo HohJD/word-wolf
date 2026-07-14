@@ -22,7 +22,7 @@ export function createInitialState() {
       wolfCount: 1,
       category: "Food & Drink",
       timerSeconds: 180,
-      blankCardEnabled: false,
+      wolfMode: "word", // "word" | "blank"
     },
     round: null,
     usedPairs: [],
@@ -37,26 +37,25 @@ export function dealRound(state) {
   const wolfIndices = pickRandom(config.playerCount, config.wolfCount);
   wolfIndices.forEach((i) => (roles[i] = "wolf"));
 
-  let blankIndex = -1;
-  if (config.blankCardEnabled && config.playerCount > config.wolfCount + 1) {
-    const available = roles
-      .map((r, i) => (r === "villager" ? i : -1))
-      .filter((i) => i >= 0);
-    blankIndex = available[Math.floor(Math.random() * available.length)];
-    roles[blankIndex] = "blank";
-  }
-
   const players = roles.map((role, i) => ({
     id: i + 1,
     role,
     word:
       role === "wolf"
-        ? pair.wolf
-        : role === "blank"
-        ? "???"
+        ? config.wolfMode === "blank"
+          ? "???"
+          : pair.wolf
         : pair.villager,
     revealed: false,
   }));
+
+  // Shuffle then guarantee first revealer is never the wolf
+  let ordered = shuffle(players);
+  if (ordered[0].role === 'wolf') {
+    const swapIdx = ordered.findIndex((p) => p.role !== 'wolf');
+    if (swapIdx > 0) [ordered[0], ordered[swapIdx]] = [ordered[swapIdx], ordered[0]];
+  }
+  ordered = ordered.map((p, i) => ({ ...p, id: i + 1 }));
 
   return {
     ...state,
@@ -64,7 +63,8 @@ export function dealRound(state) {
     round: {
       villagerWord: pair.villager,
       wolfWord: pair.wolf,
-      players: shuffle(players).map((p, i) => ({ ...p, id: i + 1 })),
+      wolfMode: config.wolfMode,
+      players: ordered,
       revealIndex: 0,
       votedOutId: null,
       wolfGuess: null,
@@ -100,7 +100,7 @@ export function proceedFromReveal(state) {
   if (votedOut && votedOut.role === "wolf") {
     return { ...state, phase: "WOLF_GUESS" };
   }
-  const winner = determineWinner(state, null);
+  const winner = determineWinner(state);
   return { ...state, phase: "RESULT", round: { ...round, winner } };
 }
 
@@ -116,20 +116,19 @@ export function submitWolfGuess(state, guess) {
   };
 }
 
-function determineWinner(state, _guess) {
+function determineWinner(state) {
   const { round } = state;
   const votedOut = round.players.find((p) => p.id === round.votedOutId);
-  if (!votedOut) return "wolves"; // no one voted out = wolves survive
+  if (!votedOut) return "wolves";
   if (votedOut.role === "wolf") return "villagers";
   return "wolves";
 }
 
 export function skipVote(state) {
-  const winner = "wolves";
   return {
     ...state,
     phase: "RESULT",
-    round: { ...state.round, winner },
+    round: { ...state.round, winner: "wolves" },
   };
 }
 
