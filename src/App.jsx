@@ -17,6 +17,7 @@ import WouldYouRather from './games/WouldYouRather';
 import MostLikelyTo from './games/MostLikelyTo';
 import HotTakes from './games/HotTakes';
 import Alias from './games/Alias';
+import Avalon from './games/Avalon/index.jsx';
 import HelpModal from './components/HelpModal';
 import './App.css';
 
@@ -120,6 +121,7 @@ export default function App() {
       {activeGame === 'mostlikelyto'  && <MostLikelyTo  onBack={back} players={players} />}
       {activeGame === 'hottakes'      && <HotTakes      onBack={back} players={players} />}
       {activeGame === 'alias'         && <Alias         onBack={back} players={players} />}
+      {activeGame === 'avalon'        && <Avalon        onBack={back} players={players} />}
     </div>
   );
 }

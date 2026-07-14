@@ -1,0 +1,575 @@
+/* Avalon dark medieval theme */
+.avalon-screen {
+  background: radial-gradient(ellipse at top, #1a1410, #09070a 60%);
+  color: #f2e8c9;
+}
+
+.avalon-screen .btn-primary {
+  background: linear-gradient(135deg, #b8860b, #8a5e0e);
+  color: #1a1410;
+  box-shadow: 0 4px 24px rgba(184, 134, 11, 0.35);
+}
+
+.avalon-screen .btn-secondary {
+  border-color: rgba(184, 134, 11, 0.4);
+  color: #f2e8c9;
+}
+
+.avalon-good { color: #5ee9a6; }
+.avalon-evil { color: #f87171; }
+
+.avalon-hero {
+  text-align: center;
+  padding: 8px 0 24px;
+}
+
+.avalon-hero .back-btn {
+  position: absolute;
+  top: 24px;
+  left: 20px;
+  color: #d4c4a0;
+}
+
+.avalon-castle {
+  font-size: 64px;
+  display: block;
+  filter: drop-shadow(0 0 24px rgba(184, 134, 11, 0.5));
+  margin-bottom: 10px;
+}
+
+.avalon-title {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffd700, #b8860b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.avalon-subtitle {
+  color: #b8a980;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.avalon-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(184, 134, 11, 0.18);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.avalon-field > label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #b8a980;
+}
+
+.avalon-stepper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.avalon-stepper button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(184, 134, 11, 0.4);
+  background: rgba(184, 134, 11, 0.12);
+  color: #f2e8c9;
+  font-size: 20px;
+}
+
+.avalon-stepper span {
+  font-size: 28px;
+  font-weight: 900;
+  min-width: 40px;
+  text-align: center;
+}
+
+.avalon-names {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.avalon-input {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(184, 134, 11, 0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #f2e8c9;
+  font-size: 15px;
+  outline: none;
+}
+
+.avalon-input::placeholder { color: #7d6f4f; }
+
+.avalon-toggles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.avalon-toggle {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(184, 134, 11, 0.25);
+  background: rgba(0, 0, 0, 0.2);
+  color: #d4c4a0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+.avalon-toggle.on { border-color: #b8860b; background: rgba(184, 134, 11, 0.12); }
+.avalon-toggle.good.on { border-color: #5ee9a6; color: #5ee9a6; }
+.avalon-toggle.evil.on { border-color: #f87171; color: #f87171; }
+
+.avalon-balance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.avalon-vs { color: #b8a980; }
+.avalon-note { font-size: 12px; color: #b8a980; width: 100%; text-align: center; }
+.avalon-error { color: #f87171; font-size: 13px; text-align: center; }
+
+.avalon-start { margin-top: auto; }
+
+.avalon-reveal {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.avalon-reveal-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(184, 134, 11, 0.25);
+  border-radius: 24px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.avalon-reveal-num {
+  color: #b8a980;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.avalon-reveal-pass {
+  color: #b8a980;
+  font-size: 16px;
+}
+
+.avalon-reveal-name {
+  font-size: 28px;
+  font-weight: 900;
+  color: #ffd700;
+}
+
+.avalon-role {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.avalon-team {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.avalon-knowledge {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  padding: 16px;
+  width: 100%;
+}
+
+.avalon-knowledge-text {
+  color: #b8a980;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.avalon-known-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.avalon-known {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 5px 10px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.avalon-board { gap: 18px; }
+
+.avalon-track {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.avalon-quest {
+  flex: 1;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(184, 134, 11, 0.18);
+  position: relative;
+}
+
+.avalon-quest.success { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.4); }
+.avalon-quest.fail { background: rgba(244, 63, 94, 0.12); border-color: rgba(244, 63, 94, 0.4); }
+
+.avalon-quest-num {
+  position: absolute;
+  top: 6px;
+  font-size: 10px;
+  color: #b8a980;
+  font-weight: 700;
+}
+
+.avalon-quest-size {
+  font-size: 22px;
+  font-weight: 900;
+  color: #f2e8c9;
+}
+
+.avalon-quest-fails {
+  font-size: 9px;
+  color: #f87171;
+  font-weight: 700;
+}
+
+.avalon-status {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(184, 134, 11, 0.18);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.avalon-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #d4c4a0;
+}
+
+.avalon-status-row strong { color: #ffd700; }
+
+.avalon-reject-dots { display: flex; gap: 6px; }
+
+.avalon-reject-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.avalon-reject-dot.on { background: #f87171; box-shadow: 0 0 8px #f87171; }
+
+.avalon-history-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #b8a980;
+  margin-bottom: 8px;
+}
+
+.avalon-history-empty { color: #7d6f4f; font-size: 13px; }
+
+.avalon-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.avalon-history-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.avalon-history-item.approved { border-left: 3px solid #5ee9a6; }
+.avalon-history-item.rejected { border-left: 3px solid #f87171; }
+
+.avalon-history-votes { font-weight: 700; }
+
+.avalon-action { margin-top: auto; }
+
+.avalon-propose-info { text-align: center; }
+.avalon-propose-leader { font-size: 18px; font-weight: 800; color: #ffd700; }
+.avalon-propose-quest { color: #b8a980; font-size: 14px; }
+
+.avalon-propose-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.avalon-propose-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(184, 134, 11, 0.18);
+  color: #f2e8c9;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.avalon-propose-player.selected {
+  border-color: #b8860b;
+  background: rgba(184, 134, 11, 0.12);
+}
+
+.avalon-propose-count { text-align: center; color: #b8a980; font-size: 13px; }
+
+.avalon-vote, .avalon-quest, .avalon-assassin, .avalon-end { align-items: center; text-align: center; }
+
+.avalon-vote-prompt, .avalon-quest-prompt {
+  font-size: 16px;
+  color: #b8a980;
+  font-weight: 700;
+}
+
+.avalon-vote-question, .avalon-quest-instruction {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffd700;
+}
+
+.avalon-vote-buttons {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+.avalon-vote-btn {
+  flex: 1;
+  padding: 20px 10px;
+  border-radius: 16px;
+  border: none;
+  font-size: 18px;
+  font-weight: 900;
+  color: #1a1410;
+}
+
+.avalon-vote-btn.approve { background: #5ee9a6; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35); }
+.avalon-vote-btn.reject { background: #f87171; box-shadow: 0 4px 20px rgba(244, 63, 94, 0.35); }
+
+.avalon-vote-progress, .avalon-quest-progress { color: #b8a980; font-size: 13px; }
+
+.avalon-vote-result {
+  padding: 24px;
+  border-radius: 20px;
+  width: 100%;
+}
+
+.avalon-vote-result.success { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); }
+.avalon-vote-result.fail { background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+.avalon-vote-result-title { font-size: 26px; font-weight: 900; }
+.avalon-vote-result-count { color: #b8a980; font-size: 15px; margin-top: 6px; }
+
+.avalon-vote-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.avalon-vote-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  font-weight: 700;
+}
+
+.avalon-vote-row.approve { border-left: 3px solid #5ee9a6; }
+.avalon-vote-row.reject { border-left: 3px solid #f87171; }
+
+.avalon-vote-badge { margin-left: auto; font-weight: 900; }
+
+.avalon-quest-cards {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+.avalon-quest-card {
+  flex: 1;
+  padding: 20px 10px;
+  border-radius: 16px;
+  border: none;
+  font-size: 17px;
+  font-weight: 900;
+  color: #1a1410;
+}
+
+.avalon-quest-card.success { background: #5ee9a6; }
+.avalon-quest-card.fail { background: #f87171; }
+.avalon-quest-card:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.avalon-quest-note { color: #f87171; font-size: 13px; }
+
+.avalon-quest-result {
+  padding: 24px;
+  border-radius: 20px;
+  width: 100%;
+}
+
+.avalon-quest-result.success { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); }
+.avalon-quest-result.fail { background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+.avalon-quest-result-title { font-size: 26px; font-weight: 900; }
+.avalon-quest-result-count { color: #b8a980; font-size: 15px; margin-top: 6px; }
+
+.avalon-assassin-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+}
+
+.avalon-assassin-icon { font-size: 48px; }
+.avalon-assassin-prompt { font-size: 20px; font-weight: 900; color: #f87171; }
+.avalon-assassin-sub { color: #b8a980; font-size: 13px; }
+
+.avalon-assassin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.avalon-assassin-target {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(184, 134, 11, 0.18);
+  color: #f2e8c9;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.avalon-end-banner {
+  padding: 28px 20px;
+  border-radius: 20px;
+  width: 100%;
+}
+
+.avalon-end-banner.good { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); }
+.avalon-end-banner.evil { background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+.avalon-end-icon { font-size: 48px; }
+.avalon-end-title { font-size: 32px; font-weight: 900; margin-top: 8px; }
+.avalon-end-assassin { color: #b8a980; font-size: 14px; margin-top: 8px; }
+
+.avalon-roles-reveal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.avalon-role-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+}
+
+.avalon-role-row.good { border-left: 3px solid #5ee9a6; }
+.avalon-role-row.evil { border-left: 3px solid #f87171; }
+
+.avalon-role-row-name { font-weight: 800; }
+.avalon-role-row-role { color: #b8a980; margin-left: auto; }
+.avalon-role-row-team { font-weight: 700; }
+
+.avalon-quest-track {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.avalon-track-token {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(184, 134, 11, 0.18);
+}
+
+.avalon-track-token.success { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); }
+.avalon-track-token.fail { background: rgba(244, 63, 94, 0.2); border-color: rgba(244, 63, 94, 0.4); }
+
+.avalon-end-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: auto; }
+
+.avalon-screen .game-topbar { width: 100%; }
+.avalon-screen .gh-title { color: #ffd700; }
+.avalon-screen .gh-sub { color: #b8a980; }

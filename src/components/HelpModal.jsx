@@ -72,6 +72,19 @@ const HELP = {
       'Pass to the next clue giver after the round.',
     ],
   },
+  avalon: {
+    title: 'The Resistance: Avalon',
+    icon: '🏰',
+    body: [
+      'Good and Evil are secretly assigned. Evil knows each other (except Oberon).',
+      'Merlin knows Evil (except Mordred). Percival sees Merlin and Morgana.',
+      'Each round the Leader proposes a quest team. Everyone votes to approve or reject it.',
+      '5 rejected proposals in a row = Evil wins.',
+      'On a quest, team members play Success/Fail. Good must play Success.',
+      'Quest 4 with 7+ players needs 2 fails to fail.',
+      '3 successful quests = Assassin guesses Merlin. 3 failed quests = Evil wins.',
+    ],
+  },
 };
 
 export default function HelpModal({ context, onClose }) {
