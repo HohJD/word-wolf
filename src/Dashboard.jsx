@@ -69,6 +69,17 @@ const GAMES = [
     live: true,
   },
   {
+    id: 'avalon',
+    name: 'Avalon',
+    icon: '🏰',
+    tagline: 'Social deduction at the Round Table',
+    players: '5–10',
+    tags: ['Strategy', 'Deduction'],
+    bg: 'linear-gradient(145deg,#3a2e1f,#1a1410)',
+    glow: 'rgba(184,134,11,0.45)',
+    live: true,
+  },
+  {
     id: 'mafia',
     name: 'Mafia',
     icon: '🕵️',
