@@ -53,9 +53,10 @@ export const createQuests = (n) =>
 
 export function validateSetup(playerCount, names, roles) {
   if (!AVALON_COUNTS[playerCount]) return 'Avalon requires 5–10 players.';
+  if (roles.percival && !roles.merlin) return 'Percival requires Merlin.';
   const [good, evil] = getCounts(playerCount);
   const goodSpecial = (roles.merlin ? 1 : 0) + (roles.percival ? 1 : 0);
-  const evilSpecial = (roles.merlin ? 1 : 0) + (roles.morgana ? 1 : 0) + (roles.mordred ? 1 : 0) + (roles.oberon ? 1 : 0);
+  const evilSpecial = 1 + (roles.morgana ? 1 : 0) + (roles.mordred ? 1 : 0) + (roles.oberon ? 1 : 0); // Assassin is always included
   if (goodSpecial > good) return 'Too many good special roles.';
   if (evilSpecial > evil) return 'Too many evil special roles.';
   const nonEmpty = names.filter(Boolean).map((n) => n.trim());
@@ -71,7 +72,7 @@ export function assignRoles(names, roles) {
   if (roles.merlin) goodRoles.push('merlin');
   if (roles.percival) goodRoles.push('percival');
   while (goodRoles.length < goodCount) goodRoles.push('loyal');
-  if (roles.merlin) evilRoles.push('assassin');
+  evilRoles.push('assassin');
   if (roles.morgana) evilRoles.push('morgana');
   if (roles.mordred) evilRoles.push('mordred');
   if (roles.oberon) evilRoles.push('oberon');
