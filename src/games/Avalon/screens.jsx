@@ -15,7 +15,7 @@ export function Lobby({ state, dispatch, onBack }) {
   const [good, evil] = getCounts(playerCount);
 
   return (
-    <div className="screen avalon-screen avalon-lobby">
+    <div className="screen avalon-screen avalon-lobby view-enter">
       <div className="avalon-hero">
         <button className="back-btn" onClick={onBack}>← Games</button>
         <span className="avalon-castle">🏰</span>
@@ -95,7 +95,7 @@ export function Reveal({ state, dispatch }) {
   const knowledge = getKnowledge(player, players);
 
   return (
-    <div className="screen avalon-screen avalon-reveal">
+    <div className="screen avalon-screen avalon-reveal view-enter">
       <div className="avalon-reveal-card">
         <span className="avalon-reveal-num">{revealIndex + 1} / {players.length}</span>
         {revealMode === 'pass' ? (
@@ -142,7 +142,7 @@ export function Board({ state, dispatch, onBack }) {
   const currentQuest = quests[questIndex];
 
   return (
-    <div className="screen avalon-screen avalon-board">
+    <div className="screen avalon-screen avalon-board view-enter">
       <GameHeader onBack={onBack} title="Avalon" subtitle="The Round Table" icon="🏰" activePlayer={leader.name} />
 
       <div className="avalon-track">
@@ -205,7 +205,7 @@ export function Propose({ state, dispatch, onBack }) {
   const size = getQuestSize(playerCount, questIndex);
 
   return (
-    <div className="screen avalon-screen avalon-propose">
+    <div className="screen avalon-screen avalon-propose view-enter">
       <GameHeader onBack={onBack} title="Propose Team" icon="🏰" activePlayer={leader.name} />
 
       <div className="avalon-propose-info">
@@ -243,7 +243,7 @@ export function Vote({ state, dispatch, onBack }) {
   if (phase === 'vote') {
     const voter = players[voteIndex];
     return (
-      <div className="screen avalon-screen avalon-vote">
+      <div className="screen avalon-screen avalon-vote view-enter">
         <GameHeader onBack={onBack} title="Approve or Reject" icon="🏰" />
         <p className="avalon-vote-prompt">Pass to {voter.name}</p>
         <Avatar name={voter.name} size={96} />
@@ -263,7 +263,7 @@ export function Vote({ state, dispatch, onBack }) {
 
   if (phase === 'vote_reveal') {
     return (
-      <div className="screen avalon-screen avalon-vote">
+      <div className="screen avalon-screen avalon-vote view-enter">
         <GameHeader onBack={onBack} title="Voting" icon="🏰" />
         <p className="avalon-vote-prompt">All votes are cast.</p>
         <p className="avalon-vote-question">Ready to reveal?</p>
@@ -276,7 +276,7 @@ export function Vote({ state, dispatch, onBack }) {
 
   const approved = voteResult.result === 'approved';
   return (
-    <div className="screen avalon-screen avalon-vote">
+    <div className="screen avalon-screen avalon-vote view-enter">
       <GameHeader onBack={onBack} title="Result" icon="🏰" />
       <div className={`avalon-vote-result ${approved ? 'success' : 'fail'}`}>
         <p className="avalon-vote-result-title">{approved ? 'Team approved' : 'Team rejected'}</p>
@@ -309,7 +309,7 @@ export function QuestPlay({ state, dispatch, onBack }) {
     const isEvil = member.team === 'evil';
 
     return (
-      <div className="screen avalon-screen avalon-quest">
+      <div className="screen avalon-screen avalon-quest view-enter">
         <GameHeader onBack={onBack} title="Quest" icon="🏰" />
         <p className="avalon-quest-prompt">Pass to {member.name}</p>
         <Avatar name={member.name} size={96} />
@@ -334,7 +334,7 @@ export function QuestPlay({ state, dispatch, onBack }) {
 
   if (phase === 'quest_reveal') {
     return (
-      <div className="screen avalon-screen avalon-quest">
+      <div className="screen avalon-screen avalon-quest view-enter">
         <GameHeader onBack={onBack} title="Quest" icon="🏰" />
         <p className="avalon-quest-prompt">All cards are played.</p>
         <p className="avalon-quest-instruction">Reveal the quest result?</p>
@@ -347,7 +347,7 @@ export function QuestPlay({ state, dispatch, onBack }) {
 
   const passed = questResult.passed;
   return (
-    <div className="screen avalon-screen avalon-quest">
+    <div className="screen avalon-screen avalon-quest view-enter">
       <GameHeader onBack={onBack} title="Quest Result" icon="🏰" />
       <div className={`avalon-quest-result ${passed ? 'success' : 'fail'}`}>
         <p className="avalon-quest-result-title">{passed ? 'Quest succeeded' : 'Quest failed'}</p>
@@ -365,7 +365,7 @@ export function Assassin({ state, dispatch, onBack }) {
   const assassin = players.find((p) => p.role === 'assassin');
 
   return (
-    <div className="screen avalon-screen avalon-assassin">
+    <div className="screen avalon-screen avalon-assassin view-enter">
       <GameHeader onBack={onBack} title="Assassination" icon="🏰" />
       <div className="avalon-assassin-card">
         <span className="avalon-assassin-icon">🗡️</span>
@@ -388,7 +388,7 @@ export function End({ state, dispatch, onBack }) {
   const { players, quests, winner, assassinGuess, merlinKilled } = state;
 
   return (
-    <div className="screen avalon-screen avalon-end">
+    <div className="screen avalon-screen avalon-end view-enter">
       <GameHeader onBack={onBack} title="Game Over" icon="🏰" />
 
       <div className={`avalon-end-banner ${winner === 'good' ? 'good' : 'evil'}`}>

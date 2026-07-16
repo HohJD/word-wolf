@@ -116,16 +116,7 @@ export default function Dashboard({ onPlay, players, onEditPlayers, onHelp }) {
       <div className="bg-orb bg-orb-2" />
       <div className="bg-orb bg-orb-3" />
 
-      <div className="dash-header">
-        <div className="dash-brand">
-          <span className="dash-brand-icon">🎮</span>
-          <div>
-            <h1 className="dash-title">JD Games</h1>
-            <p className="dash-sub">Party game collection</p>
-          </div>
-        </div>
-        <button className="help-btn" onClick={onHelp} aria-label="Help">?</button>
-      </div>
+      {/* header removed per user request */}
 
       <div className="dash-hero">
         <div className="dash-hero-left">
