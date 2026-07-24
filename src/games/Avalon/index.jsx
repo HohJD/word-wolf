@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useReducer, useEffect } from 'react';
 import { validateSetup, assignRoles, createQuests, getQuestSize } from './engine';
 import { Lobby, Reveal, Board, Propose, Vote, QuestPlay, Assassin, End } from './screens';
 import './styles.css';
@@ -7,7 +7,7 @@ const initialState = {
   phase: 'lobby',
   playerCount: 5,
   names: [],
-  roles: { merlin: true, percival: false, morgana: false, mordred: false, oberon: false },
+  roles: { percival: false, mordred: false, oberon: false },
   players: null,
   leaderIndex: 0,
   questIndex: 0,
@@ -26,14 +26,39 @@ const initialState = {
   assassinGuess: null,
   winner: null,
   merlinKilled: false,
+  reason: '',
   error: null,
 };
 
 function init({ players }) {
-  const count = Math.min(10, Math.max(5, players.length));
+  const count = Math.min(10, Math.max(5, players.length || 5));
   const names = players.slice(0, count).map((n) => n.trim());
   while (names.length < count) names.push('');
   return { ...initialState, playerCount: count, names };
+}
+
+function resetRoundState(state) {
+  return {
+    ...state,
+    leaderIndex: 0,
+    questIndex: 0,
+    rejectCount: 0,
+    voteHistory: [],
+    proposedTeam: [],
+    currentVotes: {},
+    voteIndex: 0,
+    voteResult: null,
+    questCards: {},
+    questCardIndex: 0,
+    questResult: null,
+    revealIndex: 0,
+    revealMode: 'pass',
+    assassinGuess: null,
+    winner: null,
+    merlinKilled: false,
+    reason: '',
+    error: null,
+  };
 }
 
 function avalonReducer(state, action) {
@@ -59,27 +84,10 @@ function avalonReducer(state, action) {
       if (error) return { ...state, error };
       const players = assignRoles(state.names, state.roles);
       return {
-        ...state,
+        ...resetRoundState(state),
         phase: 'reveal',
         players,
         quests: createQuests(state.playerCount),
-        leaderIndex: 0,
-        questIndex: 0,
-        rejectCount: 0,
-        voteHistory: [],
-        proposedTeam: [],
-        currentVotes: {},
-        voteIndex: 0,
-        voteResult: null,
-        questCards: {},
-        questCardIndex: 0,
-        questResult: null,
-        revealIndex: 0,
-        revealMode: 'pass',
-        assassinGuess: null,
-        winner: null,
-        merlinKilled: false,
-        error: null,
       };
     }
     case 'NEW_LOBBY':
@@ -162,6 +170,7 @@ function avalonReducer(state, action) {
           ...state,
           rejectCount,
           winner: 'evil',
+          reason: 'Five proposals were rejected in a row — chaos favors Mordred, and the quest fails by default.',
           phase: 'end',
           proposedTeam: [],
           currentVotes: {},
@@ -217,18 +226,17 @@ function avalonReducer(state, action) {
         questCardIndex: 0,
         questResult: null,
       };
-      if (successCount >= 3) {
-        const hasAssassin = state.players.some((p) => p.role === 'assassin');
-        if (hasAssassin) return { ...base, phase: 'assassin' };
-        return { ...base, phase: 'end', winner: 'good' };
-      }
       if (failCount >= 3) {
-        return { ...base, phase: 'end', winner: 'evil' };
+        return { ...base, phase: 'end', winner: 'evil', reason: 'Three quests were sabotaged from within. The realm falls to Mordred.' };
+      }
+      if (successCount >= 3) {
+        return { ...base, phase: 'assassin' };
       }
       return { ...base, phase: 'propose' };
     }
     case 'ASSASSIN_GUESS': {
       const merlin = state.players.find((p) => p.role === 'merlin');
+      const target = state.players.find((p) => p.id === action.id);
       const correct = merlin && merlin.id === action.id;
       return {
         ...state,
@@ -236,6 +244,9 @@ function avalonReducer(state, action) {
         phase: 'end',
         winner: correct ? 'evil' : 'good',
         merlinKilled: correct,
+        reason: correct
+          ? `The Assassin struck true — ${target.name} was Merlin all along.`
+          : `The Assassin named ${target.name} — but Merlin walks free. Camelot endures.`,
       };
     }
     case 'DISMISS_ERROR':
@@ -263,5 +274,13 @@ const SCREENS = {
 export default function Avalon({ onBack, players = [] }) {
   const [state, dispatch] = useReducer(avalonReducer, { players }, init);
   const Screen = SCREENS[state.phase];
+
+  // The app doesn't reset scroll on navigation, so a scrolled-down Dashboard
+  // (or a scrolled-down previous phase) would otherwise carry its scroll
+  // position into the next screen, clipping the header/back button.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [state.phase]);
+
   return <Screen state={state} dispatch={dispatch} onBack={onBack} />;
 }

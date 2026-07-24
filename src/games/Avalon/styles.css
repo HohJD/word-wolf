@@ -19,8 +19,9 @@
 .avalon-evil { color: #f87171; }
 
 .avalon-hero {
+  position: relative;
   text-align: center;
-  padding: 8px 0 24px;
+  padding: 56px 46px 24px;
 }
 
 .avalon-hero .back-btn {
@@ -38,9 +39,10 @@
 }
 
 .avalon-title {
-  font-size: 32px;
+  font-size: clamp(22px, 7vw, 32px);
   font-weight: 900;
   letter-spacing: -0.5px;
+  text-wrap: balance;
   background: linear-gradient(135deg, #ffd700, #b8860b);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -115,28 +117,55 @@
 
 .avalon-input::placeholder { color: #7d6f4f; }
 
-.avalon-toggles {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 8px;
+.avalon-note-standalone {
+  font-size: 12px;
+  color: #b8a980;
+  margin-top: 6px;
+  font-style: italic;
 }
 
-.avalon-toggle {
+.avalon-toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.avalon-toggle-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid rgba(184, 134, 11, 0.25);
   background: rgba(0, 0, 0, 0.2);
-  color: #d4c4a0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 700;
+  text-align: left;
 }
 
-.avalon-toggle.on { border-color: #b8860b; background: rgba(184, 134, 11, 0.12); }
-.avalon-toggle.good.on { border-color: #5ee9a6; color: #5ee9a6; }
-.avalon-toggle.evil.on { border-color: #f87171; color: #f87171; }
+.avalon-toggle-row.on { border-color: #b8860b; background: rgba(184, 134, 11, 0.12); }
+.avalon-toggle-row.disabled { opacity: 0.35; cursor: not-allowed; }
+
+.avalon-toggle-box {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 1px;
+  border-radius: 5px;
+  border: 1px solid rgba(184, 134, 11, 0.4);
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #1a1410;
+}
+
+.avalon-toggle-box.on { background: #b8860b; border-color: #b8860b; }
+
+.avalon-toggle-copy { display: flex; flex-direction: column; gap: 3px; }
+.avalon-toggle-name { font-weight: 700; color: #f2e8c9; font-size: 14px; }
+.avalon-toggle-desc { font-size: 12.5px; color: #b8a980; line-height: 1.4; }
 
 .avalon-balance {
   display: flex;
@@ -185,6 +214,13 @@
   font-size: 16px;
 }
 
+.avalon-reveal-instr {
+  color: #7d6f4f;
+  font-size: 13px;
+  font-style: italic;
+  margin-top: -6px;
+}
+
 .avalon-reveal-name {
   font-size: 28px;
   font-weight: 900;
@@ -196,8 +232,16 @@
   font-weight: 800;
 }
 
-.avalon-team {
+.avalon-role-desc {
+  color: #d4c4a0;
   font-size: 14px;
+  font-style: italic;
+  line-height: 1.55;
+  max-width: 320px;
+}
+
+.avalon-team {
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -210,11 +254,18 @@
   width: 100%;
 }
 
+.avalon-knowledge.lonely {
+  border: 1px dashed rgba(184, 134, 11, 0.3);
+  background: transparent;
+}
+
 .avalon-knowledge-text {
   color: #b8a980;
   font-size: 13px;
   margin-bottom: 10px;
 }
+
+.avalon-knowledge.lonely .avalon-knowledge-text { margin-bottom: 0; }
 
 .avalon-known-list {
   display: flex;
@@ -522,6 +573,7 @@
 .avalon-end-icon { font-size: 48px; }
 .avalon-end-title { font-size: 32px; font-weight: 900; margin-top: 8px; }
 .avalon-end-assassin { color: #b8a980; font-size: 14px; margin-top: 8px; }
+.avalon-end-reason { color: #d4c4a0; font-size: 14px; font-style: italic; margin-top: 8px; line-height: 1.5; }
 
 .avalon-roles-reveal {
   display: flex;
