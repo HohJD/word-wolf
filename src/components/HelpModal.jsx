@@ -85,6 +85,18 @@ const HELP = {
       'If Good wins 3 quests, the Assassin gets one guess at Merlin — right, and Evil wins anyway. 3 failed quests also wins it for Evil.',
     ],
   },
+  werewolves: {
+    title: 'Werewolves',
+    icon: '🌕',
+    body: [
+      'A few players are secretly Werewolves. Everyone else is on the Villager team.',
+      'Each night, the Werewolves secretly pick one player to eliminate.',
+      'Special roles may also act at night: the Seer checks if someone is a Werewolf, the Doctor protects someone, and the Witch can save or poison someone (once each, all game).',
+      'Each morning, the group sees who died overnight, then votes to eliminate one player. A tied vote eliminates no one.',
+      'If the Hunter is ever eliminated, they immediately take one more player down with them.',
+      'Villagers win when every Werewolf is gone. Werewolves win once they equal or outnumber everyone else.',
+    ],
+  },
 };
 
 export default function HelpModal({ context, onClose }) {

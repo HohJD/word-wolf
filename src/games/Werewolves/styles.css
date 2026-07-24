@@ -1,0 +1,386 @@
+/* Werewolves — moonlit night theme */
+.ww-screen {
+  background: radial-gradient(ellipse at top, #131a2c, #05070d 60%);
+  color: #e4e9f5;
+}
+
+.ww-screen .btn-primary {
+  background: linear-gradient(135deg, #93c5fd, #3b6fd6);
+  color: #0b0f1a;
+  box-shadow: 0 4px 24px rgba(59, 111, 214, 0.35);
+}
+
+.ww-screen .btn-secondary {
+  border-color: rgba(147, 197, 253, 0.4);
+  color: #e4e9f5;
+}
+
+.ww-good { color: #7dd3a8; }
+.ww-evil { color: #ef6b6b; }
+
+.ww-hero {
+  position: relative;
+  text-align: center;
+  padding: 56px 46px 24px;
+}
+
+.ww-hero .back-btn {
+  position: absolute;
+  top: 24px;
+  left: 20px;
+  color: #b9c6e6;
+}
+
+.ww-moon {
+  font-size: 60px;
+  display: block;
+  filter: drop-shadow(0 0 24px rgba(147, 197, 253, 0.5));
+  margin-bottom: 10px;
+}
+
+.ww-title {
+  font-size: clamp(22px, 7vw, 32px);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  text-wrap: balance;
+  background: linear-gradient(135deg, #dceaff, #7ea6e8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.ww-subtitle {
+  color: #9fb0d0;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.ww-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(147, 197, 253, 0.16);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ww-field > label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #9fb0d0;
+}
+
+.ww-stepper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.ww-stepper button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  background: rgba(147, 197, 253, 0.12);
+  color: #e4e9f5;
+  font-size: 20px;
+}
+
+.ww-stepper span {
+  font-size: 28px;
+  font-weight: 900;
+  min-width: 40px;
+  text-align: center;
+}
+
+.ww-names {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.ww-input {
+  min-width: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(147, 197, 253, 0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #e4e9f5;
+  font-size: 15px;
+  outline: none;
+}
+
+.ww-input::placeholder { color: #5c6a8c; }
+
+.ww-note {
+  font-size: 12px;
+  color: #9fb0d0;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.ww-toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ww-toggle-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(147, 197, 253, 0.25);
+  background: rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+.ww-toggle-row.on { border-color: #3b6fd6; background: rgba(59, 111, 214, 0.15); }
+.ww-toggle-row.disabled { opacity: 0.35; cursor: not-allowed; }
+
+.ww-toggle-box {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 1px;
+  border-radius: 5px;
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #0b0f1a;
+}
+
+.ww-toggle-box.on { background: #93c5fd; border-color: #93c5fd; }
+
+.ww-toggle-copy { display: flex; flex-direction: column; gap: 3px; }
+.ww-toggle-name { font-weight: 700; color: #e4e9f5; font-size: 14px; }
+.ww-toggle-desc { font-size: 12.5px; color: #9fb0d0; line-height: 1.4; }
+
+.ww-balance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.ww-vs { color: #9fb0d0; }
+.ww-error { color: #ef6b6b; font-size: 13px; text-align: center; }
+.ww-start { margin-top: auto; }
+
+.ww-reveal { align-items: center; justify-content: center; text-align: center; }
+
+.ww-reveal-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(147, 197, 253, 0.25);
+  border-radius: 24px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.ww-reveal-num { color: #9fb0d0; font-size: 12px; font-weight: 700; }
+.ww-reveal-pass { color: #9fb0d0; font-size: 16px; }
+.ww-reveal-instr { color: #5c6a8c; font-size: 13px; font-style: italic; margin-top: -6px; }
+.ww-reveal-name { font-size: clamp(24px, 7vw, 28px); font-weight: 900; color: #dceaff; }
+.ww-role-desc { color: #c3cee6; font-size: 14px; font-style: italic; line-height: 1.55; max-width: 320px; }
+.ww-team { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+
+.ww-knowledge {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  padding: 16px;
+  width: 100%;
+}
+
+.ww-knowledge-text { color: #9fb0d0; font-size: 13px; margin-bottom: 10px; }
+
+.ww-known-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+.ww-known {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 5px 10px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ww-night, .ww-day { gap: 16px; }
+.ww-night-center { align-items: center; justify-content: center; text-align: center; }
+
+.ww-round-badge {
+  align-self: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #7ea6e8;
+  background: rgba(59, 111, 214, 0.14);
+  border: 1px solid rgba(147, 197, 253, 0.25);
+  border-radius: 99px;
+  padding: 5px 14px;
+}
+
+.ww-night-prompt, .ww-day-prompt { text-align: center; font-size: 15px; color: #c3cee6; }
+.ww-day-empty { text-align: center; color: #9fb0d0; font-size: 15px; padding: 20px 0; }
+
+.ww-target-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ww-target {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(147, 197, 253, 0.18);
+  color: #e4e9f5;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.ww-target.selected { border-color: #93c5fd; background: rgba(147, 197, 253, 0.14); }
+.ww-check { margin-left: auto; }
+
+.ww-action { margin-top: 4px; }
+
+.ww-seer-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 18px;
+  padding: 24px;
+  width: 100%;
+}
+
+.ww-seer-result-name { font-size: 20px; font-weight: 800; color: #dceaff; }
+.ww-seer-result-verdict { font-size: 18px; font-weight: 900; }
+.ww-seer-result-verdict.evil { color: #ef6b6b; }
+.ww-seer-result-verdict.good { color: #7dd3a8; }
+
+.ww-witch-block { display: flex; flex-direction: column; gap: 10px; }
+.ww-witch-label { font-size: 13.5px; color: #c3cee6; }
+.ww-witch-label strong { color: #dceaff; }
+
+.ww-hunter-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  background: rgba(239, 107, 107, 0.1);
+  border: 1px solid rgba(239, 107, 107, 0.3);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.ww-hunter-icon { font-size: 32px; }
+.ww-hunter-prompt { font-size: 14.5px; color: #f2c9c9; font-weight: 700; }
+.ww-hunter-block .ww-target-list { width: 100%; }
+
+.ww-death-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ww-death-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(239, 107, 107, 0.08);
+  border-left: 3px solid #ef6b6b;
+}
+
+.ww-death-name { font-weight: 800; }
+.ww-death-role { color: #9fb0d0; margin-left: auto; font-size: 13px; }
+
+.ww-vote-progress { text-align: center; color: #9fb0d0; font-size: 13px; }
+
+.ww-tally-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ww-tally-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  font-weight: 700;
+}
+
+.ww-tally-count { margin-left: auto; color: #7ea6e8; }
+
+.ww-end { align-items: center; text-align: center; }
+
+.ww-end-banner {
+  padding: 28px 20px;
+  border-radius: 20px;
+  width: 100%;
+}
+
+.ww-end-banner.good { background: rgba(125, 211, 168, 0.12); border: 1px solid rgba(125, 211, 168, 0.3); }
+.ww-end-banner.evil { background: rgba(239, 107, 107, 0.12); border: 1px solid rgba(239, 107, 107, 0.3); }
+
+.ww-end-icon { font-size: 48px; }
+.ww-end-title { font-size: 30px; font-weight: 900; margin-top: 8px; }
+.ww-end-reason { color: #c3cee6; font-size: 14px; font-style: italic; margin-top: 8px; line-height: 1.5; }
+.ww-end-rounds { color: #9fb0d0; font-size: 12.5px; margin-top: 8px; }
+
+.ww-roles-reveal { display: flex; flex-direction: column; gap: 18px; width: 100%; }
+.ww-role-group-title {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.ww-role-group.good .ww-role-group-title { color: #7dd3a8; }
+.ww-role-group.evil .ww-role-group-title { color: #ef6b6b; }
+
+.ww-role-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.ww-role-row.good { border-left: 3px solid #7dd3a8; }
+.ww-role-row.evil { border-left: 3px solid #ef6b6b; }
+.ww-role-row.dead { opacity: 0.5; }
+
+.ww-role-row-name { font-weight: 800; }
+.ww-role-row-role { color: #9fb0d0; margin-left: auto; }
+.ww-role-row-team { font-weight: 700; }
+
+.ww-end-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: auto; }
+
+.ww-screen .gh-title { color: #dceaff; }
+.ww-screen .gh-sub { color: #9fb0d0; }

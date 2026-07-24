@@ -90,6 +90,17 @@ const GAMES = [
     glow: 'transparent',
     live: false,
   },
+  {
+    id: 'werewolves',
+    name: 'Werewolves',
+    icon: '🌕',
+    tagline: 'Find the Werewolves before dawn',
+    players: '5+',
+    tags: ['Strategy', 'Deduction'],
+    bg: 'linear-gradient(145deg,#1e293b,#0b0f1a)',
+    glow: 'rgba(59,111,214,0.4)',
+    live: true,
+  },
 ];
 
 export default function Dashboard({ onPlay, players, onEditPlayers, onHelp }) {
