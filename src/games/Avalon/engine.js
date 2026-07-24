@@ -30,35 +30,35 @@ const AVALON_QUEST_FAILS = {
 export const ROLE_INFO = {
   merlin: {
     name: 'Merlin', team: 'good',
-    desc: 'You alone glimpse the servants of Mordred moving in the dark. Guide the loyal with care — if evil unmasks you, all is lost.',
+    desc: 'You can see who the evil players are (Mordred is hidden from you, if playing). Don’t make it obvious you know.',
   },
   percival: {
     name: 'Percival', team: 'good',
-    desc: 'You know the sight of Merlin — but treachery can wear his face too. Choose your trust carefully.',
+    desc: 'You see two players below. One is Merlin, one is Morgana — you won’t know which is which.',
   },
   loyal: {
-    name: 'Loyal Servant of Arthur', team: 'good',
-    desc: 'You hold no secret sight — only your voice, your reason, and your loyalty to Camelot.',
+    name: 'Loyal Servant', team: 'good',
+    desc: 'You have no special knowledge. Listen closely and use logic to find the evil players.',
   },
   assassin: {
     name: 'Assassin', team: 'evil',
-    desc: 'Should the loyal complete their quests, you alone may still turn the tide. Name Merlin, and darkness prevails.',
+    desc: 'If good wins 3 quests, you get one guess at who Merlin is. Guess right and evil wins instead.',
   },
   morgana: {
     name: 'Morgana', team: 'evil',
-    desc: 'You cloud Percival’s sight, appearing to him as Merlin himself. Sow doubt among the loyal.',
+    desc: 'To Percival, you look exactly like Merlin. Use that to confuse him.',
   },
   mordred: {
     name: 'Mordred', team: 'evil',
-    desc: 'Your name is unknown even to Merlin. You move against Camelot unseen by its greatest seer.',
+    desc: 'Merlin cannot see that you’re evil — you’re the one evil player hidden from Merlin.',
   },
   oberon: {
     name: 'Oberon', team: 'evil',
-    desc: 'You serve Mordred alone, unknown even to your own kind. No ally will meet your eyes tonight.',
+    desc: 'You don’t know who the other evil players are, and they don’t know you either.',
   },
   minion: {
-    name: 'Minion of Mordred', team: 'evil',
-    desc: 'You know your fellow conspirators. Together, corrupt the quests from within.',
+    name: 'Minion', team: 'evil',
+    desc: 'You know who the other evil players are. Work together to make quests fail.',
   },
 };
 
@@ -112,24 +112,24 @@ export function assignRoles(names, roles) {
 export function getKnowledge(viewer, players) {
   if (viewer.role === 'merlin') {
     return {
-      text: 'You see the following move as agents of evil:',
+      text: 'These players are evil:',
       players: players.filter((p) => p.team === 'evil' && p.role !== 'mordred' && p.id !== viewer.id),
     };
   }
   if (viewer.role === 'percival') {
     return {
-      text: 'One of these two is Merlin — the other, a deception:',
+      text: 'One of these is Merlin, the other is Morgana:',
       players: shuffle(players.filter((p) => p.role === 'merlin' || p.role === 'morgana')),
     };
   }
   if (viewer.team === 'evil' && viewer.role !== 'oberon') {
     const allies = players.filter((p) => p.team === 'evil' && p.role !== 'oberon' && p.id !== viewer.id);
     if (allies.length === 0) {
-      return { text: 'No other minion reveals themselves to you tonight — one among them walks alone.', players: [], lonely: true };
+      return { text: 'You don’t know who the other evil players are.', players: [], lonely: true };
     }
-    return { text: 'Your fellow agents of Mordred:', players: allies };
+    return { text: 'These players are also evil:', players: allies };
   }
-  return { text: 'You hold no special sight tonight.', players: [] };
+  return { text: 'You have no special knowledge.', players: [] };
 }
 
 export const roleName = (role) => ROLE_INFO[role]?.name || role;

@@ -1096,6 +1096,9 @@ body {
   background: var(--glass); border: 1px solid var(--border);
   border-radius: 99px; padding: 4px 12px 4px 4px;
   font-size: 13px; font-weight: 700;
+  /* Clears the fixed help button (top:18px right:18px, 42px wide) so the
+     pill never renders underneath it. */
+  margin-right: 48px;
 }
 .gh-player-name { max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 

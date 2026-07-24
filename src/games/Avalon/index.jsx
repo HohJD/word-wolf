@@ -170,7 +170,7 @@ function avalonReducer(state, action) {
           ...state,
           rejectCount,
           winner: 'evil',
-          reason: 'Five proposals were rejected in a row — chaos favors Mordred, and the quest fails by default.',
+          reason: '5 team proposals were rejected in a row, so evil wins automatically.',
           phase: 'end',
           proposedTeam: [],
           currentVotes: {},
@@ -227,7 +227,7 @@ function avalonReducer(state, action) {
         questResult: null,
       };
       if (failCount >= 3) {
-        return { ...base, phase: 'end', winner: 'evil', reason: 'Three quests were sabotaged from within. The realm falls to Mordred.' };
+        return { ...base, phase: 'end', winner: 'evil', reason: 'Evil sabotaged 3 quests, so evil wins.' };
       }
       if (successCount >= 3) {
         return { ...base, phase: 'assassin' };
@@ -245,8 +245,8 @@ function avalonReducer(state, action) {
         winner: correct ? 'evil' : 'good',
         merlinKilled: correct,
         reason: correct
-          ? `The Assassin struck true — ${target.name} was Merlin all along.`
-          : `The Assassin named ${target.name} — but Merlin walks free. Camelot endures.`,
+          ? `${target.name} was Merlin — the Assassin guessed right, so evil wins.`
+          : `${target.name} was not Merlin, so good wins.`,
       };
     }
     case 'DISMISS_ERROR':

@@ -7,9 +7,9 @@ function teamClass(team) {
 }
 
 const OPTIONAL_ROLES = [
-  { key: 'percival', label: 'Percival & Morgana', desc: 'Percival glimpses Merlin — but Morgana appears to him just the same.', cost: 1 },
-  { key: 'mordred', label: 'Mordred', desc: 'An evil unknown even to Merlin’s sight.', cost: 1 },
-  { key: 'oberon', label: 'Oberon', desc: 'A minion isolated even from his own — unknown to evil and good alike.', cost: 1 },
+  { key: 'percival', label: 'Percival & Morgana', desc: 'Percival can spot Merlin — but Morgana looks the same to him.', cost: 1 },
+  { key: 'mordred', label: 'Mordred', desc: 'An evil player that even Merlin can’t see.', cost: 1 },
+  { key: 'oberon', label: 'Oberon', desc: 'An evil player who doesn’t know the other evil players, and isn’t known by them.', cost: 1 },
 ];
 
 export function Lobby({ state, dispatch, onBack }) {
@@ -23,8 +23,8 @@ export function Lobby({ state, dispatch, onBack }) {
       <div className="avalon-hero">
         <button className="back-btn" onClick={onBack}>← Games</button>
         <span className="avalon-castle">🏰</span>
-        <h1 className="avalon-title">The Resistance: Avalon</h1>
-        <p className="avalon-subtitle">Arthur’s court is divided. Discover the traitors.</p>
+        <h1 className="avalon-title">Avalon</h1>
+        <p className="avalon-subtitle">Some players are secretly evil. Work together to find them.</p>
       </div>
 
       <div className="avalon-card">
@@ -56,7 +56,7 @@ export function Lobby({ state, dispatch, onBack }) {
 
         <div className="avalon-field">
           <label>Optional Roles</label>
-          <p className="avalon-note avalon-note-standalone">Merlin and the Assassin are always in play.</p>
+          <p className="avalon-note avalon-note-standalone">Merlin and the Assassin are always included.</p>
           <div className="avalon-toggle-list">
             {OPTIONAL_ROLES.map((r) => {
               const active = roles[r.key];
@@ -109,7 +109,7 @@ export function Reveal({ state, dispatch }) {
             <p className="avalon-reveal-pass">Pass the device to</p>
             <h2 className="avalon-reveal-name">{player.name}</h2>
             <Avatar name={player.name} size={80} />
-            <p className="avalon-reveal-instr">When you’re alone and ready, reveal your role.</p>
+            <p className="avalon-reveal-instr">Make sure no one else can see the screen, then tap to reveal.</p>
             <button className="btn-primary avalon-reveal-btn" onClick={() => dispatch({ type: 'CONFIRM_REVEAL' })}>
               Reveal role
             </button>
@@ -321,7 +321,7 @@ export function QuestPlay({ state, dispatch, onBack }) {
         <GameHeader onBack={onBack} title="Quest" icon="🏰" />
         <p className="avalon-quest-prompt">Pass to {member.name}</p>
         <Avatar name={member.name} size={96} />
-        <p className="avalon-quest-instruction">Play your quest card</p>
+        <p className="avalon-quest-instruction">Choose Success or Fail</p>
         <div className="avalon-quest-cards">
           <button className="avalon-quest-card success" onClick={() => dispatch({ type: 'PLAY_QUEST_CARD', id: member.id, card: 'success' })}>
             ✓ Success
@@ -379,8 +379,8 @@ export function Assassin({ state, dispatch, onBack }) {
       <GameHeader onBack={onBack} title="Assassination" icon="🏰" />
       <div className="avalon-assassin-card">
         <span className="avalon-assassin-icon">🗡️</span>
-        <p className="avalon-assassin-prompt">{assassin ? assassin.name : 'The Assassin'}, guess who is Merlin</p>
-        <p className="avalon-assassin-sub">Camelot has won three quests — but one guess can still steal it back. Decide together, then choose.</p>
+        <p className="avalon-assassin-prompt">{assassin ? assassin.name : 'The Assassin'}, who is Merlin?</p>
+        <p className="avalon-assassin-sub">Good has won 3 quests. But if the Assassin guesses Merlin correctly, evil wins instead.</p>
       </div>
       <div className="avalon-assassin-list">
         {targets.map((p) => (
@@ -403,7 +403,7 @@ export function End({ state, dispatch, onBack }) {
 
       <div className={`avalon-end-banner ${winner === 'good' ? 'good' : 'evil'}`}>
         <span className="avalon-end-icon">{winner === 'good' ? '⚔️' : '🗡️'}</span>
-        <h1 className="avalon-end-title">{winner === 'good' ? 'Good Prevails' : 'Evil Triumphs'}</h1>
+        <h1 className="avalon-end-title">{winner === 'good' ? 'Good Wins!' : 'Evil Wins!'}</h1>
         {reason && <p className="avalon-end-reason">{reason}</p>}
       </div>
 
