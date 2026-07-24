@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 const HELP = {
   app: {
-    title: 'How to use JD Games',
+    title: 'How to use Party Multiplayer Games',
     icon: '🎮',
     body: [
       'Add your players once from the home screen.',

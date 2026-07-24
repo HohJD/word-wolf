@@ -41,7 +41,7 @@ export default function WelcomeModal({ open, onClose, onOpenPlayers }) {
         <div className="modal-header">
           <div className="modal-title-row">
             <span className="modal-icon">🎉</span>
-            <h2 className="modal-title">Welcome to JD Games</h2>
+            <h2 className="modal-title">Welcome to Party Multiplayer Games</h2>
           </div>
         </div>
 

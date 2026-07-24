@@ -120,8 +120,8 @@ export default function Dashboard({ onPlay, players, onEditPlayers }) {
   return (
     <div className="dashboard view-enter">
       <header className="dash-header">
-        <span className="dash-title">JD Games</span>
-        <span className="dash-sub">Party games for the group chat</span>
+        <h1 className="dash-title">Party Multiplayer Games</h1>
+        <p className="dash-sub">Party games for the group chat</p>
       </header>
 
       <div className="dash-players-row">

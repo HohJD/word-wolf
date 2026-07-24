@@ -1,7 +1,7 @@
 {
-  "name": "JD Games — Free Multiplayer Party Games",
-  "short_name": "JD Games",
-  "description": "Play free multiplayer party games online: Word Wolf, Truth or Dare, Would You Rather, Most Likely To, Hot Takes, and Alias.",
+  "name": "Party Multiplayer Games — Free Party Games Online",
+  "short_name": "Party Games",
+  "description": "Play free multiplayer party games online: Word Wolf, Avalon, Werewolves, Truth or Dare, Alias, Would You Rather, Most Likely To, and Hot Takes.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f0f14",
