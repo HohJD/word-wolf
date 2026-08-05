@@ -108,6 +108,32 @@ export function QuestTrack({ quests, questIndex, playerCount }) {
   );
 }
 
+/**
+ * The quest team, shown as faces rather than a comma list. This is what a
+ * voter is actually weighing up, so it gets the centre of the screen.
+ */
+export function TeamDisplay({ players, seats, questIndex, total = 5, caption }) {
+  return (
+    <div className="avalon-team-display">
+      <p className="avalon-team-caption">
+        {caption ?? `Quest ${questIndex + 1} of ${total}`}
+      </p>
+      <div className="avalon-team-faces">
+        {seats.map((id) => {
+          const p = players[id];
+          if (!p) return null;
+          return (
+            <div key={id} className="avalon-team-face">
+              <Avatar name={p.name} size={54} />
+              <span className="avalon-team-face-name">{p.name}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /** One-line "here is what is happening right now". */
 export function StepBanner({ you, text }) {
   return (
@@ -424,7 +450,6 @@ export function Propose({ state, dispatch, onBack, viewer }) {
 
 export function Vote({ state, dispatch, onBack, viewer }) {
   const { players, phase, currentVotes, voteIndex, voteResult } = state;
-  const team = state.proposedTeam.map((id) => players[id]?.name).filter(Boolean);
 
   if (isOnline(state) && phase === 'vote') {
     if (!viewer) return null;
@@ -438,8 +463,11 @@ export function Vote({ state, dispatch, onBack, viewer }) {
           text={myVote ? 'Vote locked in — nobody can see it yet'
                        : 'Everyone votes at the same time. Nobody sees votes until all are in.'}
         />
-        <p className="avalon-vote-prompt">Going on the quest</p>
-        <p className="avalon-vote-team">{team.join(' · ')}</p>
+        <TeamDisplay
+          players={players}
+          seats={state.proposedTeam}
+          questIndex={state.questIndex}
+        />
         {myVote ? (
           <>
             <p className="avalon-vote-cast">You voted {myVote === 'approve' ? '✓ Approve' : '✗ Reject'}</p>
@@ -500,7 +528,9 @@ export function Vote({ state, dispatch, onBack, viewer }) {
   const approved = voteResult.result === 'approved';
   return (
     <div className="screen avalon-screen avalon-vote view-enter">
-      <GameHeader onBack={onBack} title="Result" icon="🏰" />
+      <GameHeader onBack={onBack} title="Result" icon="🏰"
+        backLabel={isOnline(state) ? '← Leave' : '← Games'} />
+      {isOnline(state) && <YourRole viewer={viewer} players={players} />}
       <div className={`avalon-vote-result ${approved ? 'success' : 'fail'}`}>
         <p className="avalon-vote-result-title">{approved ? 'Team approved' : 'Team rejected'}</p>
         <p className="avalon-vote-result-count">{voteResult.approve} ✓ · {voteResult.reject} ✗</p>
@@ -541,9 +571,7 @@ export function QuestPlay({ state, dispatch, onBack, viewer }) {
           <GameHeader onBack={onBack} title="Quest" icon="🏰" backLabel="← Leave" />
           <YourRole viewer={viewer} players={players} />
           <StepBanner you={false} text="You are not on this quest — sit tight." />
-          <p className="avalon-quest-prompt">
-            {quest.team.map((id) => players[id].name).join(' · ')} are on the quest.
-          </p>
+          <TeamDisplay players={players} seats={quest.team} questIndex={questIndex} />
           <Waiting message="Waiting for the team to play their cards…" state={state} />
         </div>
       );
@@ -566,7 +594,15 @@ export function QuestPlay({ state, dispatch, onBack, viewer }) {
           </>
         ) : (
           <>
-            <p className="avalon-quest-instruction">Choose Success or Fail</p>
+            <TeamDisplay
+              players={players}
+              seats={quest.team}
+              questIndex={questIndex}
+              caption={`Quest ${questIndex + 1} · ${quest.requiredFails > 1 ? '2 fails' : '1 fail'} sinks it`}
+            />
+            <p className="avalon-quest-instruction">
+              {isEvil ? 'Play your card' : 'Send the quest through'}
+            </p>
             <div className="avalon-quest-cards">
               <button className="avalon-quest-card success" onClick={() => dispatch({ type: 'PLAY_QUEST_CARD', id: viewer.id, card: 'success' })}>
                 ✓ Success
@@ -579,7 +615,6 @@ export function QuestPlay({ state, dispatch, onBack, viewer }) {
                 ✗ Fail
               </button>
             </div>
-            {!isEvil && <p className="avalon-quest-note">Good players must play Success.</p>}
             <p className="avalon-quest-progress">{Object.keys(questCards).length} / {quest.team.length} played</p>
           </>
         )}
@@ -634,7 +669,9 @@ export function QuestPlay({ state, dispatch, onBack, viewer }) {
   const passed = questResult.passed;
   return (
     <div className="screen avalon-screen avalon-quest view-enter">
-      <GameHeader onBack={onBack} title="Quest Result" icon="🏰" />
+      <GameHeader onBack={onBack} title="Quest Result" icon="🏰"
+        backLabel={isOnline(state) ? '← Leave' : '← Games'} />
+      {isOnline(state) && <YourRole viewer={viewer} players={players} />}
       <div className={`avalon-quest-result ${passed ? 'success' : 'fail'}`}>
         <p className="avalon-quest-result-title">{passed ? 'Quest succeeded' : 'Quest failed'}</p>
         <p className="avalon-quest-result-count">{questResult.failCount} fail{questResult.failCount !== 1 ? 's' : ''} · {questResult.required} needed to fail</p>

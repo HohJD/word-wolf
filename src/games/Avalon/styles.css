@@ -432,12 +432,30 @@
 .avalon-propose-count { text-align: center; color: #b8a980; font-size: 13px; }
 
 /* Content flows from the top so the header stays put, and the primary
-   action is pushed to the bottom where a thumb actually reaches it. */
+   action sits at the bottom where a thumb actually reaches it. The
+   question takes `margin: auto 0` so the leftover space splits evenly
+   above and below it rather than collecting into one dead gap. */
 .avalon-vote, .avalon-quest, .avalon-assassin {
   align-items: center; justify-content: flex-start; text-align: center;
 }
-.avalon-vote-buttons, .avalon-quest-cards, .avalon-assassin-list { margin-top: auto; }
+/* align-items:center would otherwise shrink these to their content width. */
+.avalon-vote > .gh-wrap, .avalon-quest > .gh-wrap, .avalon-assassin > .gh-wrap,
+.avalon-vote > .avalon-you, .avalon-quest > .avalon-you, .avalon-assassin > .avalon-you,
+.avalon-vote > .avalon-step, .avalon-quest > .avalon-step, .avalon-assassin > .avalon-step {
+  width: 100%;
+}
+/* `margin-top: auto` collects the slack into ONE gap and keeps the question
+   attached to the buttons it belongs with, instead of stranding it between
+   two voids. Content reads top-down; the action group sits at the bottom. */
+.avalon-vote-question, .avalon-quest-instruction { margin-top: auto; }
 .avalon-vote-progress, .avalon-quest-progress { margin-bottom: 4px; }
+
+/* A disabled action must look unavailable, not merely dimmer. */
+.avalon-quest-card:disabled {
+  opacity: 0.32;
+  filter: grayscale(0.7);
+  cursor: not-allowed;
+}
 .avalon-end { align-items: center; text-align: center; }
 
 .avalon-vote-prompt, .avalon-quest-prompt {
@@ -857,4 +875,31 @@
 
 .avalon-status-note {
   font-size: 11px; color: var(--text-3); margin-top: 2px;
+}
+
+/* ── Proposed / questing team, shown as faces ──
+   The screens that ask you to judge a team had two large dead gaps; the
+   team itself is what belongs in that space. */
+.avalon-team-display {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 18px 14px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--glass);
+}
+.avalon-team-caption {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--text-3);
+}
+.avalon-team-faces {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;
+}
+.avalon-team-face {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  animation: viewIn 0.25s var(--smooth) both;
+}
+.avalon-team-face-name {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
