@@ -40,6 +40,22 @@
 button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; }
 
+/* ── Touch behaviour ──
+   Removes the grey flash on tap, the 300ms double-tap-zoom delay, and the
+   accidental text selection you get from long-pressing game controls. */
+button, a, [role='button'], label {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Every tappable control clears the 44px minimum comfortably. */
+button:not(.back-btn) { min-height: 44px; }
+
+/* iOS zooms the page when a focused input is under 16px. */
+input, select, textarea { font-size: 16px; }
+
 /* ── Shell ── */
 body {
   background: var(--bg);
@@ -48,6 +64,17 @@ body {
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* Stops the whole page rubber-banding past its bounds on iOS. */
+  overscroll-behavior-y: contain;
+}
+
+/* Respect the system setting rather than animating regardless. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 #root { display: flex; min-height: 100dvh; }
 
@@ -102,7 +129,10 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 24px 20px 40px;
+  /* index.html sets viewport-fit=cover, so the notch and home indicator
+     overlap the page unless we pad for them explicitly. */
+  padding: calc(24px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right))
+           calc(40px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
   gap: 16px;
   min-height: 100dvh;
   position: relative;
@@ -390,6 +420,30 @@ body {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .gc-meta { font-size: 11px; font-weight: 600; color: var(--text-3); }
+
+/* ── Featured card (Avalon) ──
+   Spans the grid so the headline game reads first. */
+.game-card--featured {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-color: var(--border-hi);
+  background: linear-gradient(135deg, var(--accent-bg, var(--glass-2)) 0%, var(--glass) 70%);
+}
+.game-card--featured .gc-icon { width: 46px; height: 46px; font-size: 23px; }
+.game-card--featured .gc-body { flex: 1; }
+.game-card--featured .gc-name { font-size: 17px; }
+.game-card--featured .gc-tagline { font-size: 13px; }
+
+.gc-name { display: flex; align-items: center; gap: 7px; }
+.gc-badge {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+  padding: 3px 6px; border-radius: 5px;
+  background: rgba(52, 211, 153, 0.16); color: #34d399;
+  flex-shrink: 0;
+}
 
 /* ══════════════════════════════════════════════════════
    WORD WOLF — Setup

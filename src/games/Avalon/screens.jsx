@@ -1,9 +1,49 @@
 import Avatar from '../../components/Avatar';
 import GameHeader from '../../components/GameHeader';
 import { getCounts, getQuestSize, getKnowledge, roleName, roleDesc, teamName, evilExtraAvailable } from './engine';
+import { waitingOn } from './state';
 
 function teamClass(team) {
   return team === 'good' ? 'avalon-good' : 'avalon-evil';
+}
+
+const isOnline = (state) => state.mode === 'online';
+const leaderOf = (state) => state.players[state.leaderIndex % state.players.length];
+
+// Online only: what everyone who isn't the acting player sees.
+export function Waiting({ message, state }) {
+  const progress = waitingOn(state);
+  return (
+    <div className="avalon-waiting">
+      <span className="avalon-waiting-dots" aria-hidden="true"><i /><i /><i /></span>
+      <p className="avalon-waiting-msg">{message}</p>
+      {progress && (
+        <p className="avalon-waiting-count">
+          {progress.done} / {progress.total} {progress.label}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// The private knowledge block shown to a single player (their own view).
+function KnowledgeBlock({ knowledge }) {
+  if (knowledge.players.length === 0 && !knowledge.lonely) return null;
+  return (
+    <div className={`avalon-knowledge ${knowledge.lonely ? 'lonely' : ''}`}>
+      <p className="avalon-knowledge-text">{knowledge.text}</p>
+      {knowledge.players.length > 0 && (
+        <div className="avalon-known-list">
+          {knowledge.players.map((p) => (
+            <div key={p.id} className="avalon-known">
+              <Avatar name={p.name} size={28} />
+              <span>{p.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 const OPTIONAL_ROLES = [
@@ -95,8 +135,37 @@ export function Lobby({ state, dispatch, onBack }) {
   );
 }
 
-export function Reveal({ state, dispatch }) {
+export function Reveal({ state, dispatch, viewer }) {
   const { players, revealIndex, revealMode } = state;
+
+  // Online: no passing. Each phone shows only its own player's role.
+  if (isOnline(state)) {
+    if (!viewer) return null;
+    const knowledge = getKnowledge(viewer, players);
+    const acknowledged = Boolean(state.ready?.[viewer.id]);
+
+    return (
+      <div className="screen avalon-screen avalon-reveal view-enter">
+        <div className="avalon-reveal-card">
+          <p className={`avalon-team ${teamClass(viewer.team)}`}>{teamName(viewer.team)}</p>
+          <h2 className="avalon-reveal-name">{roleName(viewer.role)}</h2>
+          <p className="avalon-role-desc">{roleDesc(viewer.role)}</p>
+          <KnowledgeBlock knowledge={knowledge} />
+          {acknowledged ? (
+            <Waiting message="Waiting for the others to read their roles…" state={state} />
+          ) : (
+            <button
+              className="btn-primary avalon-reveal-btn"
+              onClick={() => dispatch({ type: 'MARK_READY', id: viewer.id })}
+            >
+              Got it — I'm ready
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   const player = players[revealIndex];
   const knowledge = getKnowledge(player, players);
 
@@ -144,7 +213,7 @@ export function Reveal({ state, dispatch }) {
   );
 }
 
-export function Board({ state, dispatch, onBack }) {
+export function Board({ state, dispatch, onBack, viewer }) {
   const { players, leaderIndex, questIndex, quests, rejectCount, voteHistory } = state;
   const leader = players[leaderIndex % players.length];
   const currentQuest = quests[questIndex];
@@ -200,17 +269,22 @@ export function Board({ state, dispatch, onBack }) {
         )}
       </div>
 
-      <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'START_PROPOSE' })}>
-        Propose team →
-      </button>
+      {isOnline(state) && viewer && viewer.id !== leader.id ? (
+        <Waiting message={`Waiting for ${leader.name} to propose a team…`} state={state} />
+      ) : (
+        <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'START_PROPOSE' })}>
+          Propose team →
+        </button>
+      )}
     </div>
   );
 }
 
-export function Propose({ state, dispatch, onBack }) {
+export function Propose({ state, dispatch, onBack, viewer }) {
   const { players, leaderIndex, questIndex, playerCount, proposedTeam, error } = state;
   const leader = players[leaderIndex % players.length];
   const size = getQuestSize(playerCount, questIndex);
+  const canPick = !isOnline(state) || (viewer && viewer.id === leader.id);
 
   return (
     <div className="screen avalon-screen avalon-propose view-enter">
@@ -226,6 +300,7 @@ export function Propose({ state, dispatch, onBack }) {
           <button
             key={p.id}
             className={`avalon-propose-player ${proposedTeam.includes(p.id) ? 'selected' : ''}`}
+            disabled={!canPick}
             onClick={() => dispatch({ type: 'PROPOSE_TOGGLE', id: p.id })}
           >
             <Avatar name={p.name} size={36} />
@@ -236,17 +311,53 @@ export function Propose({ state, dispatch, onBack }) {
       </div>
 
       <p className="avalon-propose-count">{proposedTeam.length} / {size} selected</p>
-      {error && <p className="avalon-error">{error}</p>}
+      {error && canPick && <p className="avalon-error">{error}</p>}
 
-      <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'SUBMIT_PROPOSAL' })}>
-        Submit proposal
-      </button>
+      {canPick ? (
+        <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'SUBMIT_PROPOSAL' })}>
+          Submit proposal
+        </button>
+      ) : (
+        <Waiting message={`${leader.name} is choosing the team…`} state={state} />
+      )}
     </div>
   );
 }
 
-export function Vote({ state, dispatch, onBack }) {
+export function Vote({ state, dispatch, onBack, viewer }) {
   const { players, phase, currentVotes, voteIndex, voteResult } = state;
+  const team = state.proposedTeam.map((id) => players[id]?.name).filter(Boolean);
+
+  if (isOnline(state) && phase === 'vote') {
+    if (!viewer) return null;
+    const myVote = currentVotes[viewer.id];
+    return (
+      <div className="screen avalon-screen avalon-vote view-enter">
+        <GameHeader onBack={onBack} title="Approve or Reject" icon="🏰" />
+        <p className="avalon-vote-prompt">Proposed team</p>
+        <p className="avalon-vote-team">{team.join(' · ')}</p>
+        {myVote ? (
+          <>
+            <p className="avalon-vote-cast">You voted {myVote === 'approve' ? '✓ Approve' : '✗ Reject'}</p>
+            <Waiting message="Waiting for everyone else to vote…" state={state} />
+          </>
+        ) : (
+          <>
+            <p className="avalon-vote-question">Do you approve this team?</p>
+            <div className="avalon-vote-buttons">
+              <button className="avalon-vote-btn approve" onClick={() => dispatch({ type: 'CAST_VOTE', id: viewer.id, vote: 'approve' })}>
+                ✓ Approve
+              </button>
+              <button className="avalon-vote-btn reject" onClick={() => dispatch({ type: 'CAST_VOTE', id: viewer.id, vote: 'reject' })}>
+                ✗ Reject
+              </button>
+            </div>
+            <p className="avalon-vote-progress">{Object.keys(currentVotes).length} / {players.length} voted</p>
+          </>
+        )}
+      </div>
+    );
+  }
 
   if (phase === 'vote') {
     const voter = players[voteIndex];
@@ -299,16 +410,69 @@ export function Vote({ state, dispatch, onBack }) {
           </div>
         ))}
       </div>
-      <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'CONTINUE_FROM_VOTE' })}>
-        Continue
-      </button>
+      {isOnline(state) && viewer && viewer.id !== leaderOf(state).id ? (
+        <Waiting message={`Waiting for ${leaderOf(state).name} to continue…`} state={state} />
+      ) : (
+        <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'CONTINUE_FROM_VOTE' })}>
+          Continue
+        </button>
+      )}
     </div>
   );
 }
 
-export function QuestPlay({ state, dispatch, onBack }) {
+export function QuestPlay({ state, dispatch, onBack, viewer }) {
   const { players, phase, quests, questIndex, questCards } = state;
   const quest = quests[questIndex];
+
+  if (isOnline(state) && phase === 'quest') {
+    if (!viewer) return null;
+    const onTeam = quest.team.includes(viewer.id);
+    const played = questCards[viewer.id] !== undefined;
+    const isEvil = viewer.team === 'evil';
+
+    if (!onTeam) {
+      return (
+        <div className="screen avalon-screen avalon-quest view-enter">
+          <GameHeader onBack={onBack} title="Quest" icon="🏰" />
+          <p className="avalon-quest-prompt">
+            {quest.team.map((id) => players[id].name).join(' · ')} are on the quest.
+          </p>
+          <Waiting message="Waiting for the team to play their cards…" state={state} />
+        </div>
+      );
+    }
+
+    return (
+      <div className="screen avalon-screen avalon-quest view-enter">
+        <GameHeader onBack={onBack} title="Quest" icon="🏰" />
+        {played ? (
+          <>
+            <p className="avalon-quest-prompt">Card played.</p>
+            <Waiting message="Waiting for the rest of the team…" state={state} />
+          </>
+        ) : (
+          <>
+            <p className="avalon-quest-instruction">Choose Success or Fail</p>
+            <div className="avalon-quest-cards">
+              <button className="avalon-quest-card success" onClick={() => dispatch({ type: 'PLAY_QUEST_CARD', id: viewer.id, card: 'success' })}>
+                ✓ Success
+              </button>
+              <button
+                className="avalon-quest-card fail"
+                disabled={!isEvil}
+                onClick={() => dispatch({ type: 'PLAY_QUEST_CARD', id: viewer.id, card: 'fail' })}
+              >
+                ✗ Fail
+              </button>
+            </div>
+            {!isEvil && <p className="avalon-quest-note">Good players must play Success.</p>}
+            <p className="avalon-quest-progress">{Object.keys(questCards).length} / {quest.team.length} played</p>
+          </>
+        )}
+      </div>
+    );
+  }
 
   if (phase === 'quest') {
     const team = quest.team;
@@ -362,17 +526,36 @@ export function QuestPlay({ state, dispatch, onBack }) {
         <p className="avalon-quest-result-title">{passed ? 'Quest succeeded' : 'Quest failed'}</p>
         <p className="avalon-quest-result-count">{questResult.failCount} fail{questResult.failCount !== 1 ? 's' : ''} · {questResult.required} needed to fail</p>
       </div>
-      <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'CONTINUE_FROM_QUEST' })}>
-        Continue
-      </button>
+      {isOnline(state) && viewer && viewer.id !== leaderOf(state).id ? (
+        <Waiting message={`Waiting for ${leaderOf(state).name} to continue…`} state={state} />
+      ) : (
+        <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'CONTINUE_FROM_QUEST' })}>
+          Continue
+        </button>
+      )}
     </div>
   );
 }
 
-export function Assassin({ state, dispatch, onBack }) {
+export function Assassin({ state, dispatch, onBack, viewer }) {
   const { players } = state;
   const assassin = players.find((p) => p.role === 'assassin');
   const targets = players.filter((p) => p.team === 'good');
+
+  // Online: only the Assassin picks; everyone else watches.
+  if (isOnline(state) && viewer && viewer.role !== 'assassin') {
+    return (
+      <div className="screen avalon-screen avalon-assassin view-enter">
+        <GameHeader onBack={onBack} title="Assassination" icon="🏰" />
+        <div className="avalon-assassin-card">
+          <span className="avalon-assassin-icon">🗡️</span>
+          <p className="avalon-assassin-prompt">Good has won 3 quests.</p>
+          <p className="avalon-assassin-sub">The Assassin now gets one guess at Merlin. Guess right and evil steals the win.</p>
+        </div>
+        <Waiting message="The Assassin is choosing…" state={state} />
+      </div>
+    );
+  }
 
   return (
     <div className="screen avalon-screen avalon-assassin view-enter">
@@ -394,7 +577,7 @@ export function Assassin({ state, dispatch, onBack }) {
   );
 }
 
-export function End({ state, dispatch, onBack }) {
+export function End({ state, dispatch, onBack, isHost = true }) {
   const { players, quests, winner, reason } = state;
 
   return (
@@ -424,10 +607,14 @@ export function End({ state, dispatch, onBack }) {
         ))}
       </div>
 
-      <div className="avalon-end-actions">
-        <button className="btn-primary" onClick={() => dispatch({ type: 'START_GAME' })}>Play again</button>
-        <button className="btn-secondary" onClick={() => dispatch({ type: 'NEW_LOBBY' })}>Change setup</button>
-      </div>
+      {isHost ? (
+        <div className="avalon-end-actions">
+          <button className="btn-primary" onClick={() => dispatch({ type: 'START_GAME' })}>Play again</button>
+          <button className="btn-secondary" onClick={() => dispatch({ type: 'NEW_LOBBY' })}>Change setup</button>
+        </div>
+      ) : (
+        <p className="avalon-end-hostnote">Waiting for the host to start another round…</p>
+      )}
     </div>
   );
 }

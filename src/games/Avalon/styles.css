@@ -628,3 +628,134 @@
 .avalon-screen .game-topbar { width: 100%; }
 .avalon-screen .gh-title { color: #ffd700; }
 .avalon-screen .gh-sub { color: #b8a980; }
+
+/* ═══════════════════════════════════════════════════
+   Online play — mode select, room lobby, waiting states
+   ═══════════════════════════════════════════════════ */
+
+/* ── Mode select ── */
+.avalon-modes { display: flex; flex-direction: column; gap: 12px; }
+
+.avalon-mode {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 16px;
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-lg);
+  background: var(--glass);
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s var(--smooth);
+}
+.avalon-mode:hover:not(:disabled) { background: var(--glass-hover); transform: translateY(-2px); }
+.avalon-mode:active:not(:disabled) { transform: scale(0.985); }
+.avalon-mode:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.avalon-mode-icon {
+  width: 46px; height: 46px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; border-radius: 13px;
+  background: rgba(184, 134, 11, 0.16);
+}
+.avalon-mode-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.avalon-mode-name { font-size: 16px; font-weight: 700; color: var(--text); }
+.avalon-mode-desc { font-size: 13px; color: var(--text-3); line-height: 1.35; }
+
+/* ── Room code ── */
+.avalon-code-badge {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 18px;
+  border: 1px dashed var(--border-hi);
+  border-radius: var(--r-lg);
+  background: var(--glass-2);
+  transition: background 0.15s;
+}
+.avalon-code-badge:active { background: var(--glass-hover); }
+.avalon-code-value {
+  font-size: 40px; font-weight: 900; letter-spacing: 10px;
+  /* letter-spacing pads the right side; pull it back so it looks centred */
+  text-indent: 10px;
+  color: #e8c76a;
+  font-variant-numeric: tabular-nums;
+}
+.avalon-code-hint { font-size: 12px; color: var(--text-3); }
+
+.avalon-code-input {
+  text-align: center; letter-spacing: 8px; text-indent: 8px;
+  font-size: 22px; font-weight: 800; text-transform: uppercase;
+}
+
+.avalon-or {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--text-3); font-size: 12px;
+}
+.avalon-or::before, .avalon-or::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── Seat list ── */
+.avalon-seats { display: flex; flex-direction: column; gap: 8px; }
+.avalon-seat {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--glass-2);
+  animation: viewIn 0.25s var(--smooth) both;
+}
+.avalon-seat.me { border-color: rgba(184, 134, 11, 0.5); }
+.avalon-seat.empty { opacity: 0.4; border-style: dashed; justify-content: center; }
+.avalon-seat-name { flex: 1; font-size: 15px; font-weight: 600; }
+.avalon-seat-tag {
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
+  padding: 3px 7px; border-radius: 5px;
+  background: var(--glass-hover); color: var(--text-3);
+}
+.avalon-seat-tag.you { background: rgba(184, 134, 11, 0.18); color: #e8c76a; }
+
+/* ── Waiting ── */
+.avalon-waiting {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 22px 16px;
+  text-align: center;
+}
+.avalon-waiting-msg { font-size: 15px; color: var(--text-2); line-height: 1.4; }
+.avalon-waiting-count { font-size: 13px; font-weight: 700; color: var(--text-3); }
+
+.avalon-waiting-dots { display: flex; gap: 6px; }
+.avalon-waiting-dots i {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #b8860b;
+  animation: avalonPulse 1.2s ease-in-out infinite;
+}
+.avalon-waiting-dots i:nth-child(2) { animation-delay: 0.15s; }
+.avalon-waiting-dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes avalonPulse {
+  0%, 60%, 100% { opacity: 0.25; transform: scale(0.8); }
+  30%           { opacity: 1;    transform: scale(1); }
+}
+
+/* ── Misc online bits ── */
+.avalon-vote-team {
+  font-size: 17px; font-weight: 700; text-align: center;
+  color: #e8c76a; line-height: 1.4;
+}
+.avalon-vote-cast {
+  font-size: 15px; font-weight: 700; text-align: center; color: var(--text-2);
+}
+.avalon-end-hostnote {
+  font-size: 14px; color: var(--text-3); text-align: center; padding: 12px;
+}
+
+/* Sync errors float above the game rather than shifting the layout. */
+.avalon-error-float {
+  position: fixed;
+  left: 50%; transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 50;
+  max-width: min(440px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  background: rgba(60, 20, 20, 0.94);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}

@@ -2,6 +2,16 @@ import Avatar from './components/Avatar';
 
 const GAMES = [
   {
+    id: 'avalon',
+    name: 'Avalon',
+    icon: '🏰',
+    tagline: 'Find the hidden traitors',
+    players: '5–10',
+    accent: '#b8860b',
+    live: true,
+    featured: true,
+  },
+  {
     id: 'wordwolf',
     name: 'Word Wolf',
     icon: '🐺',
@@ -56,15 +66,6 @@ const GAMES = [
     live: true,
   },
   {
-    id: 'avalon',
-    name: 'Avalon',
-    icon: '🏰',
-    tagline: 'Find the hidden traitors',
-    players: '5–10',
-    accent: '#b8860b',
-    live: true,
-  },
-  {
     id: 'werewolves',
     name: 'Werewolves',
     icon: '🌕',
@@ -96,14 +97,17 @@ function GameCard({ game, onPlay }) {
   const style = game.live ? { '--accent-bg': hexToRgba(game.accent, 0.16) } : undefined;
   return (
     <button
-      className={`game-card${game.live ? '' : ' game-card--soon'}`}
+      className={`game-card${game.live ? '' : ' game-card--soon'}${game.featured ? ' game-card--featured' : ''}`}
       style={style}
       onClick={game.live ? () => onPlay(game.id) : undefined}
       disabled={!game.live}
     >
       <span className="gc-icon">{game.icon}</span>
       <span className="gc-body">
-        <span className="gc-name">{game.name}</span>
+        <span className="gc-name">
+          {game.name}
+          {game.featured && <span className="gc-badge">Online</span>}
+        </span>
         <span className="gc-tagline">{game.tagline}</span>
       </span>
       <span className="gc-meta">
