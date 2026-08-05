@@ -18,40 +18,35 @@ npm run dev -- --host  # also reachable from phones on the same wifi
 Online mode needs a Supabase project. Without one the site still works —
 "Play online" is disabled and pass-and-play is unaffected.
 
-1. Copy `.env.example` to `.env` and fill in your project URL and anon key
-   (Supabase dashboard → Project Settings → API).
-2. Create the `rooms` table:
+Copy `.env.example` to `.env` and fill in your project URL and anon key
+(Supabase dashboard → Project Settings → API), then apply
+`supabase/schema.sql`.
 
-```sql
-create table public.rooms (
-  code        text primary key,
-  host_token  text not null,
-  phase       text not null default 'lobby',
-  state       jsonb not null default '{}'::jsonb,
-  seats       jsonb not null default '[]'::jsonb,
-  version     integer not null default 0,
-  created_at  timestamptz not null default now(),
-  updated_at  timestamptz not null default now()
-);
+### How secrets are kept
 
-alter table public.rooms enable row level security;
+Avalon is a hidden-role game, so "the client can see the state" is not an
+acceptable answer. Three things must never reach another player's browser:
+who holds which role, who played Fail on a quest, and how someone voted
+before everyone has committed.
 
--- Play needs open read/write: the whole game state is this row, and every
--- phone drives it.
-create policy "anon read rooms"   on public.rooms for select to anon using (true);
-create policy "anon create rooms" on public.rooms for insert to anon with check (true);
-create policy "anon update rooms" on public.rooms for update to anon
-  using (true) with check (true);
+None of them live in the shared room row:
 
--- Deletion is deliberately narrower. A blanket policy would let anyone wipe
--- every game in progress with one REST call; this limits it to rooms already
--- past the cleanup window, which is all createRoom()'s sweep needs.
-create policy "anon delete stale rooms" on public.rooms for delete to anon
-  using (created_at < now() - interval '12 hours');
-
-alter publication supabase_realtime add table public.rooms;
-alter table public.rooms replica identity full;
-```
+- `room_members`, `room_secrets` and `room_submissions` have RLS enabled and
+  **no policies at all**, so the anon key cannot read or write them.
+- Everything goes through `security definer` functions that check the
+  caller's per-device token first. `my_role()` returns your role and nobody
+  else's; `reveal_roles()` refuses until the game is over.
+- Roles are dealt **server-side** by `deal_avalon()`. If a client dealt them,
+  the host would know the whole table.
+- Player tokens are never published. Earlier they sat in `rooms.seats`,
+  which meant anyone could read another player's token and ask the server
+  for their role — the public row now carries display names only.
+- `submit_action()` writes votes and quest cards to a table nobody can read,
+  and resolves the round in the same call that completes it. Only counts are
+  public while a round is open, and quest results report *how many* failed,
+  never *who*.
+- The server rejects a good player trying to play Fail, a non-host trying to
+  deal, and a non-Assassin trying to assassinate.
 
 ### Deploying
 

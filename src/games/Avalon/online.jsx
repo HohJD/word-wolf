@@ -4,9 +4,15 @@ import { getCounts, evilExtraAvailable } from './engine';
 import { SCREENS } from './screenMap';
 import Avatar from '../../components/Avatar';
 import {
-  createRoom, joinRoom, leaveRoom, fetchRoom, mutateRoom, subscribeRoom,
-  playerToken, normaliseCode, MIN_SEATS, MAX_SEATS,
+  createRoom, joinRoom, leaveRoom, closeRoom, fetchRoom, mutateRoom, subscribeRoom,
+  myRole, mySeat, dealGame, submitAction, assassinGuess, revealRoles,
+  normaliseCode, MIN_SEATS, MAX_SEATS,
 } from '../../lib/room';
+
+// Round keys scope a batch of secret submissions. A new proposal or a new
+// quest starts a fresh batch, so stale votes can never bleed across rounds.
+const voteKey  = (st) => `v-${st.questIndex}-${st.rejectCount}-${st.leaderIndex}`;
+const questKey = (st) => `q-${st.questIndex}`;
 
 const ROOM_KEY = 'ww_avalon_room';
 
@@ -41,8 +47,10 @@ function useWakeLock(active) {
 }
 
 export default function AvalonOnline({ onBack }) {
-  const token = playerToken();
   const [room, setRoom] = useState(null);
+  const [me, setMe] = useState(null);        // { seat, name, isHost }
+  const [secret, setSecret] = useState(null); // { seat, role, team, knows }
+  const [finalRoles, setFinalRoles] = useState(null);
   const [name, setName] = useState('');
   const [codeInput, setCodeInput] = useState('');
   const [error, setError] = useState(null);
@@ -53,10 +61,14 @@ export default function AvalonOnline({ onBack }) {
 
   const code = room?.code || null;
   const seats = seatOrder(room?.seats);
-  const mySeat = seats.find((s) => s.token === token);
-  const isHost = room?.host_token === token;
+  const isHost = Boolean(me?.isHost);
   const state = room?.state && room.state.phase ? room.state : null;
-  const viewer = state?.players && mySeat ? state.players.find((p) => p.id === mySeat.seat) : null;
+
+  // The public row knows names only. Role and private knowledge come from
+  // the server, scoped to this device's token.
+  const viewer = state?.players && secret
+    ? { ...state.players[secret.seat], role: secret.role, team: secret.team, knows: secret.knows }
+    : null;
 
   useWakeLock(Boolean(state) && state.phase !== 'lobby');
 
@@ -66,16 +78,42 @@ export default function AvalonOnline({ onBack }) {
     let alive = true;
     const saved = (() => { try { return localStorage.getItem(ROOM_KEY); } catch { return null; } })();
     if (!saved) { setCheckedSaved(true); return () => { alive = false; }; }
-    fetchRoom(saved)
-      .then((r) => {
+    (async () => {
+      try {
+        const seat = await mySeat(saved);   // server decides if this device has a seat
         if (!alive) return;
-        if (r && (r.seats || []).some((s) => s.token === token)) setRoom(r);
-        else try { localStorage.removeItem(ROOM_KEY); } catch { /* ignore */ }
-      })
-      .catch(() => {})
-      .finally(() => { if (alive) setCheckedSaved(true); });
+        if (seat) {
+          setMe(seat);
+          const r = await fetchRoom(saved);
+          if (alive && r) setRoom(r);
+        } else {
+          try { localStorage.removeItem(ROOM_KEY); } catch { /* ignore */ }
+        }
+      } catch { /* offline; fall through to the entry screen */ }
+      if (alive) setCheckedSaved(true);
+    })();
     return () => { alive = false; };
-  }, [token]);
+  }, []);
+
+  // Fetch this device's role once the game is dealt. Re-fetched on a new
+  // deal so "play again" hands out fresh roles.
+  const dealtAt = state && state.phase !== 'lobby' && state.players ? state.players.length : 0;
+  const isRevealPhase = state?.phase === 'reveal';
+  useEffect(() => {
+    if (!code || !dealtAt) { setSecret(null); return undefined; }
+    let alive = true;
+    myRole(code).then((r) => { if (alive) setSecret(r); }).catch(() => {});
+    return () => { alive = false; };
+  }, [code, dealtAt, isRevealPhase]);
+
+  // Everyone's role, but only once the game is actually over.
+  const phase = state?.phase;
+  useEffect(() => {
+    if (!code || phase !== 'end') { setFinalRoles(null); return undefined; }
+    let alive = true;
+    revealRoles(code).then((r) => { if (alive) setFinalRoles(r); }).catch(() => {});
+    return () => { alive = false; };
+  }, [code, phase]);
 
   // Live room updates. Version guard stops a slow poll response from
   // overwriting a newer state we already applied optimistically.
@@ -92,12 +130,42 @@ export default function AvalonOnline({ onBack }) {
     });
   }, [code]);
 
+  const refresh = useCallback((c) => {
+    fetchRoom(c).then((r) => r && setRoom((cur) => (cur && r.version < cur.version ? cur : r)))
+      .catch(() => {});
+  }, []);
+
+  /**
+   * Public transitions run the shared reducer against the room row.
+   * Anything secret — dealing, votes, quest cards, the assassination — is
+   * routed to a server function instead, because the client is not allowed
+   * to know enough to compute it.
+   */
   const dispatch = useCallback(async (action) => {
     const current = roomRef.current;
     if (!current) return;
-    // Apply locally first so the tap feels instant, then reconcile.
-    setRoom((r) => (r ? { ...r, state: avalonReducer(r.state, action) } : r));
+    const st = current.state;
+
     try {
+      switch (action.type) {
+        case 'START_GAME':
+          await dealGame(current.code);
+          return refresh(current.code);
+        case 'CAST_VOTE':
+          await submitAction(current.code, voteKey(st), 'vote', action.vote);
+          return refresh(current.code);
+        case 'PLAY_QUEST_CARD':
+          await submitAction(current.code, questKey(st), 'quest', action.card);
+          return refresh(current.code);
+        case 'ASSASSIN_GUESS':
+          await assassinGuess(current.code, action.id);
+          return refresh(current.code);
+        default:
+          break;
+      }
+
+      // Public transition: apply locally first so the tap feels instant.
+      setRoom((r) => (r ? { ...r, state: avalonReducer(r.state, action) } : r));
       const updated = await mutateRoom(current.code, (fresh) => {
         const next = avalonReducer(fresh.state, action);
         return { state: next, phase: next.phase };
@@ -105,20 +173,22 @@ export default function AvalonOnline({ onBack }) {
       setRoom((cur) => (cur && updated.version < cur.version ? cur : updated));
     } catch (e) {
       setError(e.message || 'Could not sync — check your connection.');
-      fetchRoom(current.code).then((r) => r && setRoom(r)).catch(() => {});
+      refresh(current.code);
     }
-  }, []);
+  }, [refresh]);
 
-  const remember = (r) => {
-    setRoom(r);
-    try { localStorage.setItem(ROOM_KEY, r.code); } catch { /* ignore */ }
+  const remember = async (res) => {
+    setMe({ seat: res.seat, isHost: res.isHost });
+    try { localStorage.setItem(ROOM_KEY, res.code); } catch { /* ignore */ }
+    const r = await fetchRoom(res.code);
+    if (r) setRoom(r);
   };
 
   const handleCreate = async () => {
     if (!name.trim()) return setError('Enter your name first.');
     setBusy(true); setError(null);
     try {
-      remember(await createRoom(name, { ...initialState, mode: 'online', phase: 'lobby' }));
+      await remember(await createRoom(name, { ...initialState, mode: 'online', phase: 'lobby' }));
     } catch (e) {
       setError(e.message || 'Could not create a room.');
     } finally { setBusy(false); }
@@ -130,22 +200,27 @@ export default function AvalonOnline({ onBack }) {
     if (c.length !== 4) return setError('Room codes are 4 letters.');
     setBusy(true); setError(null);
     try {
-      remember(await joinRoom(c, name));
+      await remember(await joinRoom(c, name));
     } catch (e) {
       setError(e.message || 'Could not join that room.');
     } finally { setBusy(false); }
   };
 
   const handleLeave = async () => {
-    if (code) await leaveRoom(code);
+    if (code) {
+      // The host closing ends the game for everyone; anyone else just
+      // gives up their lobby seat.
+      if (isHost && state?.phase === 'lobby') await closeRoom(code);
+      else await leaveRoom(code);
+    }
     try { localStorage.removeItem(ROOM_KEY); } catch { /* ignore */ }
-    setRoom(null);
+    setRoom(null); setMe(null); setSecret(null); setFinalRoles(null);
     onBack();
   };
 
   const handleStart = () => {
     if (seats.length < MIN_SEATS) return setError(`You need at least ${MIN_SEATS} players.`);
-    dispatch({ type: 'START_GAME', names: seats.map((s) => s.name) });
+    dispatch({ type: 'START_GAME' });
   };
 
   const share = async () => {
@@ -238,11 +313,13 @@ export default function AvalonOnline({ onBack }) {
             <label>Players ({seats.length}/{MAX_SEATS})</label>
             <div className="avalon-seats">
               {seats.map((s) => (
-                <div key={s.token} className={`avalon-seat${s.token === token ? ' me' : ''}`}>
+                // Seats carry no tokens now, so identity is by seat number:
+                // the creator holds seat 0, and the server told us ours.
+                <div key={s.seat} className={`avalon-seat${s.seat === me?.seat ? ' me' : ''}`}>
                   <Avatar name={s.name} size={32} />
                   <span className="avalon-seat-name">{s.name}</span>
-                  {s.token === room.host_token && <span className="avalon-seat-tag">Host</span>}
-                  {s.token === token && <span className="avalon-seat-tag you">You</span>}
+                  {s.seat === 0 && <span className="avalon-seat-tag">Host</span>}
+                  {s.seat === me?.seat && <span className="avalon-seat-tag you">You</span>}
                 </div>
               ))}
               {Array.from({ length: Math.max(0, MIN_SEATS - seats.length) }).map((_, i) => (
@@ -318,7 +395,16 @@ export default function AvalonOnline({ onBack }) {
   return (
     <>
       {error && <p className="avalon-error avalon-error-float" onClick={() => setError(null)}>{error}</p>}
-      <Screen state={state} dispatch={dispatch} onBack={handleLeave} viewer={viewer} isHost={isHost} />
+      <Screen
+        state={finalRoles ? { ...state, players: state.players.map((p) => {
+          const r = finalRoles.find((f) => f.seat === p.id);
+          return r ? { ...p, role: r.role, team: r.team } : p;
+        }) } : state}
+        dispatch={dispatch}
+        onBack={handleLeave}
+        viewer={viewer}
+        isHost={isHost}
+      />
     </>
   );
 }

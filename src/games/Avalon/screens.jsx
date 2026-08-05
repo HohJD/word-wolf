@@ -138,10 +138,16 @@ export function Lobby({ state, dispatch, onBack }) {
 export function Reveal({ state, dispatch, viewer }) {
   const { players, revealIndex, revealMode } = state;
 
-  // Online: no passing. Each phone shows only its own player's role.
+  // Online: no passing. Each phone shows only its own player's role, and
+  // the private knowledge is computed server-side — the public player list
+  // carries names only, so it cannot be derived here.
   if (isOnline(state)) {
     if (!viewer) return null;
-    const knowledge = getKnowledge(viewer, players);
+    const knowledge = {
+      text: viewer.knows?.text || 'You have no special knowledge.',
+      players: (viewer.knows?.seats || []).map((seat) => players[seat]).filter(Boolean),
+      lonely: viewer.team === 'evil' && (viewer.knows?.seats || []).length === 0,
+    };
     const acknowledged = Boolean(state.ready?.[viewer.id]);
 
     return (
@@ -539,8 +545,14 @@ export function QuestPlay({ state, dispatch, onBack, viewer }) {
 
 export function Assassin({ state, dispatch, onBack, viewer }) {
   const { players } = state;
-  const assassin = players.find((p) => p.role === 'assassin');
-  const targets = players.filter((p) => p.team === 'good');
+  const online = isOnline(state);
+  // Online: nobody's role is public, so the Assassin can only be identified
+  // from the viewer's own secret.
+  const assassin = online ? (viewer?.role === 'assassin' ? viewer : null)
+                          : players.find((p) => p.role === 'assassin');
+  // Likewise, good players can't be filtered publicly — offer everyone else.
+  const targets = online ? players.filter((p) => p.id !== viewer?.id)
+                         : players.filter((p) => p.team === 'good');
 
   // Online: only the Assassin picks; everyone else watches.
   if (isOnline(state) && viewer && viewer.role !== 'assassin') {
