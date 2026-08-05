@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jd-games.app/sitemap.xml
+Sitemap: https://jiadagames.vercel.app/sitemap.xml
