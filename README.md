@@ -35,8 +35,19 @@ create table public.rooms (
 );
 
 alter table public.rooms enable row level security;
-create policy "anon full access" on public.rooms
-  for all to anon using (true) with check (true);
+
+-- Play needs open read/write: the whole game state is this row, and every
+-- phone drives it.
+create policy "anon read rooms"   on public.rooms for select to anon using (true);
+create policy "anon create rooms" on public.rooms for insert to anon with check (true);
+create policy "anon update rooms" on public.rooms for update to anon
+  using (true) with check (true);
+
+-- Deletion is deliberately narrower. A blanket policy would let anyone wipe
+-- every game in progress with one REST call; this limits it to rooms already
+-- past the cleanup window, which is all createRoom()'s sweep needs.
+create policy "anon delete stale rooms" on public.rooms for delete to anon
+  using (created_at < now() - interval '12 hours');
 
 alter publication supabase_realtime add table public.rooms;
 alter table public.rooms replica identity full;
