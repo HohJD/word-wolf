@@ -1076,12 +1076,14 @@ body {
    SHARED GAME HEADER
 ══════════════════════════════════════════════════════ */
 .gh-wrap {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 4px 0;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 8px; padding: 4px 0;
 }
-.gh-wrap .back-btn { flex-shrink: 0; }
-.gh-spacer { width: 80px; }
-.gh-center { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
+/* Both flanks claim the same width so the centre column stays centred and
+   the back button can never ride over the title. */
+.gh-wrap .back-btn { flex: 0 0 84px; min-width: 0; }
+.gh-spacer { flex: 0 0 84px; }
+.gh-center { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; min-width: 0; }
 .gh-icon { font-size: 28px; filter: drop-shadow(0 0 12px rgba(139,92,246,0.35)); }
 .gh-title {
   font-size: 18px; font-weight: 900; margin: 0;
@@ -1090,15 +1092,24 @@ body {
 }
 .gh-sub { font-size: 12px; color: var(--text-3); margin: 0; text-align: center; }
 .gh-player {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--glass); border: 1px solid var(--border);
-  border-radius: 99px; padding: 4px 12px 4px 4px;
-  font-size: 13px; font-weight: 700;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
+  flex: 0 0 auto;
   /* Clears the fixed help button (top:18px right:18px, 42px wide) so the
      pill never renders underneath it. */
   margin-right: 48px;
 }
-.gh-player-name { max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Labelled: an unlabelled name chip reads as "you", but it names the leader. */
+.gh-player-label {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-3);
+}
+.gh-player-id {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 99px; padding: 3px 10px 3px 3px;
+  font-size: 13px; font-weight: 700;
+}
+.gh-player-name { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ══════════════════════════════════════════════════════
    PLAYER SPINNER

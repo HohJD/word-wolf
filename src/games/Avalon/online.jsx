@@ -58,6 +58,10 @@ export default function AvalonOnline({ onBack }) {
   const [checkedSaved, setCheckedSaved] = useState(false);
   const roomRef = useRef(null);
   roomRef.current = room;
+  // Public writes are serialised. Two taps in quick succession (picking a
+  // team, say) would otherwise each read the room independently and one
+  // selection would be lost — a toggle re-applied on retry cancels itself.
+  const queueRef = useRef(Promise.resolve());
 
   const code = room?.code || null;
   const seats = seatOrder(room?.seats);
@@ -130,10 +134,11 @@ export default function AvalonOnline({ onBack }) {
     });
   }, [code]);
 
-  const refresh = useCallback((c) => {
-    fetchRoom(c).then((r) => r && setRoom((cur) => (cur && r.version < cur.version ? cur : r)))
-      .catch(() => {});
-  }, []);
+  // Returns its promise so queued actions wait for the room to settle
+  // before the next one reads it.
+  const refresh = useCallback((c) => fetchRoom(c)
+    .then((r) => { if (r) setRoom((cur) => (cur && r.version < cur.version ? cur : r)); })
+    .catch(() => {}), []);
 
   /**
    * Public transitions run the shared reducer against the room row.
@@ -141,7 +146,7 @@ export default function AvalonOnline({ onBack }) {
    * routed to a server function instead, because the client is not allowed
    * to know enough to compute it.
    */
-  const dispatch = useCallback(async (action) => {
+  const runAction = useCallback(async (action) => {
     const current = roomRef.current;
     if (!current) return;
     const st = current.state;
@@ -150,16 +155,16 @@ export default function AvalonOnline({ onBack }) {
       switch (action.type) {
         case 'START_GAME':
           await dealGame(current.code);
-          return refresh(current.code);
+          return await refresh(current.code);
         case 'CAST_VOTE':
           await submitAction(current.code, voteKey(st), 'vote', action.vote);
-          return refresh(current.code);
+          return await refresh(current.code);
         case 'PLAY_QUEST_CARD':
           await submitAction(current.code, questKey(st), 'quest', action.card);
-          return refresh(current.code);
+          return await refresh(current.code);
         case 'ASSASSIN_GUESS':
           await assassinGuess(current.code, action.id);
-          return refresh(current.code);
+          return await refresh(current.code);
         default:
           break;
       }
@@ -176,6 +181,12 @@ export default function AvalonOnline({ onBack }) {
       refresh(current.code);
     }
   }, [refresh]);
+
+  /** Queues actions so each one starts from the settled room state. */
+  const dispatch = useCallback((action) => {
+    queueRef.current = queueRef.current.then(() => runAction(action), () => runAction(action));
+    return queueRef.current;
+  }, [runAction]);
 
   const remember = async (res) => {
     setMe({ seat: res.seat, isHost: res.isHost });

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Avatar from '../../components/Avatar';
 import GameHeader from '../../components/GameHeader';
 import { getCounts, getQuestSize, getKnowledge, roleName, roleDesc, teamName, evilExtraAvailable } from './engine';
@@ -22,6 +23,97 @@ export function Waiting({ message, state }) {
           {progress.done} / {progress.total} {progress.label}
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * Always-visible reminder of who you are and what you are, tappable to
+ * re-open the full role card. Without this a player who forgets their role
+ * mid-game has no way to check it — which matters most for the roles that
+ * carry secret knowledge.
+ */
+export function YourRole({ viewer, players }) {
+  const [open, setOpen] = useState(false);
+  if (!viewer) return null;
+  const known = (viewer.knows?.seats || []).map((seat) => players[seat]).filter(Boolean);
+
+  return (
+    <>
+      <button className={`avalon-you ${teamClass(viewer.team)}`} onClick={() => setOpen(true)}>
+        <Avatar name={viewer.name} size={26} />
+        <span className="avalon-you-name">{viewer.name}</span>
+        <span className="avalon-you-sep">·</span>
+        <span className="avalon-you-role">{roleName(viewer.role)}</span>
+        <span className="avalon-you-peek">tap</span>
+      </button>
+
+      {open && (
+        <div className="avalon-sheet-backdrop" onClick={() => setOpen(false)}>
+          <div className="avalon-sheet" onClick={(e) => e.stopPropagation()}>
+            <p className={`avalon-team ${teamClass(viewer.team)}`}>{teamName(viewer.team)}</p>
+            <h2 className="avalon-reveal-name">{roleName(viewer.role)}</h2>
+            <p className="avalon-role-desc">{roleDesc(viewer.role)}</p>
+            {known.length > 0 && (
+              <div className="avalon-knowledge">
+                <p className="avalon-knowledge-text">{viewer.knows.text}</p>
+                <div className="avalon-known-list">
+                  {known.map((p) => (
+                    <div key={p.id} className="avalon-known">
+                      <Avatar name={p.name} size={28} />
+                      <span>{p.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <button className="btn-secondary" onClick={() => setOpen(false)}>Hide</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * The quest track. Bare numbers meant nothing on their own, so each token
+ * now says what it is, the current quest is highlighted, and finished
+ * quests read as a clear pass or fail.
+ */
+export function QuestTrack({ quests, questIndex, playerCount }) {
+  return (
+    <div className="avalon-track-wrap">
+      <div className="avalon-track">
+        {quests.map((q, i) => {
+          const done = q.result === 'success' || q.result === 'fail';
+          const current = i === questIndex && !done;
+          return (
+            <div key={i} className={`avalon-quest ${q.result}${current ? ' current' : ''}`}>
+              <span className="avalon-quest-num">Quest {i + 1}</span>
+              <span className="avalon-quest-size">
+                {done ? (q.result === 'success' ? '✓' : '✗') : q.size}
+              </span>
+              <span className="avalon-quest-unit">
+                {done ? (q.result === 'success' ? 'passed' : 'failed') : 'players'}
+              </span>
+              {q.requiredFails > 1 && !done && <span className="avalon-quest-fails">needs 2 fails</span>}
+            </div>
+          );
+        })}
+      </div>
+      <p className="avalon-track-key">
+        {playerCount ? `Good needs 3 quests to win · Evil needs 3` : ''}
+      </p>
+    </div>
+  );
+}
+
+/** One-line "here is what is happening right now". */
+export function StepBanner({ you, text }) {
+  return (
+    <div className={`avalon-step ${you ? 'you' : ''}`}>
+      <span className="avalon-step-tag">{you ? 'Your turn' : 'Waiting'}</span>
+      <span className="avalon-step-text">{text}</span>
     </div>
   );
 }
@@ -226,42 +318,37 @@ export function Board({ state, dispatch, onBack, viewer }) {
 
   return (
     <div className="screen avalon-screen avalon-board view-enter">
-      <GameHeader onBack={onBack} title="Avalon" subtitle="The Round Table" icon="🏰" activePlayer={leader.name} />
+      <GameHeader onBack={onBack} title="Avalon" subtitle="The Round Table" icon="🏰"
+        activePlayer={leader.name} activeLabel="Leader"
+        backLabel={isOnline(state) ? '← Leave' : '← Games'} />
 
-      <div className="avalon-track">
-        {quests.map((q, i) => (
-          <div key={i} className={`avalon-quest ${q.result}`}>
-            <span className="avalon-quest-num">{i + 1}</span>
-            <span className="avalon-quest-size">{q.size}</span>
-            {q.requiredFails > 1 && <span className="avalon-quest-fails">2 fails</span>}
-          </div>
-        ))}
-      </div>
+      {isOnline(state) && <YourRole viewer={viewer} players={players} />}
+
+      <StepBanner
+        you={!isOnline(state) || viewer?.id === leader.id}
+        text={(!isOnline(state) || viewer?.id === leader.id)
+          ? `Pick ${currentQuest?.size} players for Quest ${questIndex + 1}`
+          : `${leader.name} is picking ${currentQuest?.size} players for Quest ${questIndex + 1}`}
+      />
+
+      <QuestTrack quests={quests} questIndex={questIndex} playerCount={players.length} />
 
       <div className="avalon-status">
         <div className="avalon-status-row">
-          <span>Leader</span>
-          <strong>{leader.name}</strong>
-        </div>
-        <div className="avalon-status-row">
-          <span>Quest {questIndex + 1}</span>
-          <strong>{currentQuest?.size} players {currentQuest?.requiredFails > 1 ? '• 2 fails needed' : ''}</strong>
-        </div>
-        <div className="avalon-status-row">
-          <span>Rejections</span>
+          <span>Rejected proposals</span>
           <div className="avalon-reject-dots">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className={`avalon-reject-dot ${i < rejectCount ? 'on' : ''}`} />
             ))}
           </div>
         </div>
+        <p className="avalon-status-note">5 rejections in a row and evil wins.</p>
       </div>
 
+      {voteHistory.length > 0 && (
       <div className="avalon-history">
         <p className="avalon-history-title">Vote History</p>
-        {voteHistory.length === 0 ? (
-          <p className="avalon-history-empty">No proposals yet.</p>
-        ) : (
+        {(
           <div className="avalon-history-list">
             {voteHistory.map((h, i) => (
               <div key={i} className={`avalon-history-item ${h.result}`}>
@@ -274,10 +361,9 @@ export function Board({ state, dispatch, onBack, viewer }) {
           </div>
         )}
       </div>
+      )}
 
-      {isOnline(state) && viewer && viewer.id !== leader.id ? (
-        <Waiting message={`Waiting for ${leader.name} to propose a team…`} state={state} />
-      ) : (
+      {(!isOnline(state) || viewer?.id === leader.id) && (
         <button className="btn-primary avalon-action" onClick={() => dispatch({ type: 'START_PROPOSE' })}>
           Propose team →
         </button>
@@ -294,12 +380,18 @@ export function Propose({ state, dispatch, onBack, viewer }) {
 
   return (
     <div className="screen avalon-screen avalon-propose view-enter">
-      <GameHeader onBack={onBack} title="Propose Team" icon="🏰" activePlayer={leader.name} />
+      <GameHeader onBack={onBack} title="Propose Team" icon="🏰"
+        activePlayer={leader.name} activeLabel="Leader"
+        backLabel={isOnline(state) ? '← Leave' : '← Games'} />
 
-      <div className="avalon-propose-info">
-        <p className="avalon-propose-leader">Leader: {leader.name}</p>
-        <p className="avalon-propose-quest">Quest {questIndex + 1} — choose {size} players</p>
-      </div>
+      {isOnline(state) && <YourRole viewer={viewer} players={players} />}
+
+      <StepBanner
+        you={canPick}
+        text={canPick
+          ? `Tap ${size} players to send on Quest ${questIndex + 1}`
+          : `${leader.name} is choosing who goes on Quest ${questIndex + 1}`}
+      />
 
       <div className="avalon-propose-list">
         {players.map((p) => (
@@ -339,8 +431,14 @@ export function Vote({ state, dispatch, onBack, viewer }) {
     const myVote = currentVotes[viewer.id];
     return (
       <div className="screen avalon-screen avalon-vote view-enter">
-        <GameHeader onBack={onBack} title="Approve or Reject" icon="🏰" />
-        <p className="avalon-vote-prompt">Proposed team</p>
+        <GameHeader onBack={onBack} title="Approve or Reject" icon="🏰" backLabel="← Leave" />
+        <YourRole viewer={viewer} players={players} />
+        <StepBanner
+          you={!myVote}
+          text={myVote ? 'Vote locked in — nobody can see it yet'
+                       : 'Everyone votes at the same time. Nobody sees votes until all are in.'}
+        />
+        <p className="avalon-vote-prompt">Going on the quest</p>
         <p className="avalon-vote-team">{team.join(' · ')}</p>
         {myVote ? (
           <>
@@ -440,7 +538,9 @@ export function QuestPlay({ state, dispatch, onBack, viewer }) {
     if (!onTeam) {
       return (
         <div className="screen avalon-screen avalon-quest view-enter">
-          <GameHeader onBack={onBack} title="Quest" icon="🏰" />
+          <GameHeader onBack={onBack} title="Quest" icon="🏰" backLabel="← Leave" />
+          <YourRole viewer={viewer} players={players} />
+          <StepBanner you={false} text="You are not on this quest — sit tight." />
           <p className="avalon-quest-prompt">
             {quest.team.map((id) => players[id].name).join(' · ')} are on the quest.
           </p>
@@ -451,7 +551,14 @@ export function QuestPlay({ state, dispatch, onBack, viewer }) {
 
     return (
       <div className="screen avalon-screen avalon-quest view-enter">
-        <GameHeader onBack={onBack} title="Quest" icon="🏰" />
+        <GameHeader onBack={onBack} title="Quest" icon="🏰" backLabel="← Leave" />
+        <YourRole viewer={viewer} players={players} />
+        <StepBanner
+          you={!played}
+          text={played ? 'Card played — the result shows once everyone has played'
+                       : (isEvil ? 'You may pass or sabotage. Nobody learns who did what.'
+                                 : 'You are good, so you must play Success.')}
+        />
         {played ? (
           <>
             <p className="avalon-quest-prompt">Card played.</p>
